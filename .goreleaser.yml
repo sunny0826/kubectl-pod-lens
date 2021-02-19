@@ -1,10 +1,10 @@
-project_name: {{ .PluginName }}
+project_name: sniffer
 release:
   github:
-    owner: {{ .Owner }}
-    name: {{ .Repo }}
+    owner: sunny0826
+    name: kubectl-sniffer
 builds:
-  - id: {{ .PluginName }}
+  - id: sniffer
     goos:
     - linux
     - windows
@@ -17,12 +17,12 @@ builds:
       - GO111MODULE=on
     main: cmd/plugin/main.go
     ldflags: -s -w
-      -X github.com/{{ .Owner }}/{{ .Repo }}/pkg/version.version=
+      -X github.com/sunny0826/kubectl-sniffer/pkg/version.version=
 archives:
-  - id: {{ .PluginName }}
+  - id: sniffer
     builds:
-    - {{ .PluginName }}
-    name_template: {{ `"{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"` }}
+    - sniffer
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
     format_overrides:
     - goos: windows
       format: zip

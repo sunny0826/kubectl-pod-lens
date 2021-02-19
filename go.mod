@@ -1,4 +1,4 @@
-module github.com/replicatedhq/krew-plugin-template
+module github.com/sunny0826/kubectl-sniffer
 
 go 1.12
 
