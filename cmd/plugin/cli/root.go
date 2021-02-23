@@ -2,17 +2,13 @@ package cli
 
 import (
 	"fmt"
-	"os"
-	"strings"
-	"time"
-
-	"github.com/sunny0826/kubectl-sniffer/pkg/logger"
-	"github.com/sunny0826/kubectl-sniffer/pkg/plugin"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/tj/go-spin"
+	"github.com/sunny0826/kubectl-sniffer/pkg/plugin"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"os"
+	"strings"
 )
 
 var (
@@ -30,39 +26,17 @@ func RootCmd() *cobra.Command {
 			viper.BindPFlags(cmd.Flags())
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			log := logger.NewLogger()
-			log.Info("")
-
-			s := spin.New()
-			finishedCh := make(chan bool, 1)
-			namespaceName := make(chan string, 1)
-			go func() {
-				lastNamespaceName := ""
-				for {
-					select {
-					case <-finishedCh:
-						fmt.Printf("\r")
-						return
-					case n := <-namespaceName:
-						lastNamespaceName = n
-					case <-time.After(time.Millisecond * 100):
-						if lastNamespaceName == "" {
-							fmt.Printf("\r  \033[36mSearching for namespaces\033[m %s", s.Next())
-						} else {
-							fmt.Printf("\r  \033[36mSearching for namespaces\033[m %s (%s)", s.Next(), lastNamespaceName)
-						}
-					}
-				}
-			}()
-			defer func() {
-				finishedCh <- true
-			}()
-
-			if err := plugin.RunPlugin(KubernetesConfigFlags, namespaceName); err != nil {
-				return errors.Cause(err)
+			if len(args) < 1 {
+				return errors.New("A pod name is required!")
 			}
 
-			log.Info("")
+			podName := args[0]
+			argsChannel := make(chan string, 1)
+			argsChannel <- podName
+
+			if err := plugin.RunPlugin(KubernetesConfigFlags, argsChannel); err != nil {
+				return errors.Cause(err)
+			}
 
 			return nil
 		},
@@ -72,6 +46,23 @@ func RootCmd() *cobra.Command {
 
 	KubernetesConfigFlags = genericclioptions.NewConfigFlags(false)
 	KubernetesConfigFlags.AddFlags(cmd.Flags())
+
+	cmd.Flags().MarkHidden("as-group")
+	cmd.Flags().MarkHidden("as")
+	cmd.Flags().MarkHidden("cache-dir")
+	cmd.Flags().MarkHidden("certificate-authority")
+	cmd.Flags().MarkHidden("client-certificate")
+	cmd.Flags().MarkHidden("client-key")
+	cmd.Flags().MarkHidden("cluster")
+	cmd.Flags().MarkHidden("context")
+	cmd.Flags().MarkHidden("insecure-skip-tls-verify")
+	cmd.Flags().MarkHidden("kubeconfig")
+	cmd.Flags().MarkHidden("password")
+	cmd.Flags().MarkHidden("request-timeout")
+	cmd.Flags().MarkHidden("server")
+	cmd.Flags().MarkHidden("token")
+	cmd.Flags().MarkHidden("user")
+	cmd.Flags().MarkHidden("username")
 
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 	return cmd
