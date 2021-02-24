@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/pterm/pterm"
 	"github.com/olekukonko/tablewriter"
+	"github.com/pterm/pterm"
 	"os"
 )
 
@@ -21,12 +21,11 @@ func main() {
 	root := pterm.NewTreeFromLeveledList(leveledList)
 
 	// Render TreePrinter
-	a,_:=pterm.DefaultTree.WithRoot(root).Srender()
+	a, _ := pterm.DefaultTree.WithRoot(root).Srender()
 	// Declare panels in a two dimensional grid system.
 	panels := pterm.Panels{
 		{{Data: "[node]\n[namespace]\n[type]\n[workload]\n[pod]\n[containers]"}, {Data: a}},
 	}
-
 
 	_ = pterm.DefaultPanel.WithPanels(panels).WithPadding(0).Render()
 	//t,_:=pterm.DefaultBulletList.WithItems([]pterm.BulletListItem{
