@@ -2,13 +2,14 @@ package cli
 
 import (
 	"fmt"
+	"os"
+	"strings"
+
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/sunny0826/kubectl-sniffer/pkg/plugin"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
-	"os"
-	"strings"
 )
 
 var (
@@ -18,12 +19,12 @@ var (
 func RootCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "sniffer",
-		Short:         "",
+		Short:         "View pod related resources.",
 		Long:          `.`,
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		PreRun: func(cmd *cobra.Command, args []string) {
-			viper.BindPFlags(cmd.Flags())
+			_ = viper.BindPFlags(cmd.Flags())
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) < 1 {
@@ -47,22 +48,21 @@ func RootCmd() *cobra.Command {
 	KubernetesConfigFlags = genericclioptions.NewConfigFlags(false)
 	KubernetesConfigFlags.AddFlags(cmd.Flags())
 
-	cmd.Flags().MarkHidden("as-group")
-	cmd.Flags().MarkHidden("as")
-	cmd.Flags().MarkHidden("cache-dir")
-	cmd.Flags().MarkHidden("certificate-authority")
-	cmd.Flags().MarkHidden("client-certificate")
-	cmd.Flags().MarkHidden("client-key")
-	cmd.Flags().MarkHidden("cluster")
-	cmd.Flags().MarkHidden("context")
-	cmd.Flags().MarkHidden("insecure-skip-tls-verify")
-	cmd.Flags().MarkHidden("kubeconfig")
-	cmd.Flags().MarkHidden("password")
-	cmd.Flags().MarkHidden("request-timeout")
-	cmd.Flags().MarkHidden("server")
-	cmd.Flags().MarkHidden("token")
-	cmd.Flags().MarkHidden("user")
-	cmd.Flags().MarkHidden("username")
+	_ = cmd.Flags().MarkHidden("as-group")
+	_ = cmd.Flags().MarkHidden("as")
+	_ = cmd.Flags().MarkHidden("cache-dir")
+	_ = cmd.Flags().MarkHidden("certificate-authority")
+	_ = cmd.Flags().MarkHidden("client-certificate")
+	_ = cmd.Flags().MarkHidden("client-key")
+	_ = cmd.Flags().MarkHidden("cluster")
+	_ = cmd.Flags().MarkHidden("insecure-skip-tls-verify")
+	_ = cmd.Flags().MarkHidden("kubeconfig")
+	_ = cmd.Flags().MarkHidden("password")
+	_ = cmd.Flags().MarkHidden("request-timeout")
+	_ = cmd.Flags().MarkHidden("server")
+	_ = cmd.Flags().MarkHidden("token")
+	_ = cmd.Flags().MarkHidden("user")
+	_ = cmd.Flags().MarkHidden("username")
 
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 	return cmd
