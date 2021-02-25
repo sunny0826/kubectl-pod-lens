@@ -1,6 +1,9 @@
 package plugin
 
 import (
+	"os"
+	"strings"
+
 	"github.com/i582/cfmt"
 	"github.com/olekukonko/tablewriter"
 	"github.com/pkg/errors"
@@ -13,8 +16,6 @@ import (
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
-	"os"
-	"strings"
 )
 
 type Workload struct {
@@ -67,7 +68,7 @@ func (sf *SnifferPlugin) findPodByName(name string, namespace string) error {
 	// we will seek the whole cluster if namespace is not passed as a flag (it will be a "" string)
 	podFind, err := sf.Clientset.CoreV1().Pods(namespace).List(metav1.ListOptions{FieldSelector: podFieldSelector})
 	if err != nil || len(podFind.Items) == 0 {
-		return errors.New("Failed to get pod: check your parameters, set a context or verify API server.")
+		return errors.New("Failed to get pod: [" + name + "], please check your parameters, set a context or verify API server.")
 	}
 
 	sf.PodObject = &podFind.Items[0]
@@ -89,7 +90,7 @@ func (sf *SnifferPlugin) getLabelByPod() error {
 	} else if _, ok = labels["app.kubernetes.io/name"]; ok {
 		labelSelector = "app.kubernetes.io/name=" + labels["app.kubernetes.io/name"]
 	} else {
-		cfmt.Println("Failed to get other, These labels do not exist: {{[release]}}::green {{[app]}}::green {{[k8s-app]}}::green {{[app.kubernetes.io/name]}}::green")
+		_, _ = cfmt.Println("Failed to get other, These labels do not exist: {{[release]}}::green {{[app]}}::green {{[k8s-app]}}::green {{[app.kubernetes.io/name]}}::green")
 		os.Exit(1)
 	}
 	sf.LabelSelector = labelSelector
@@ -326,20 +327,27 @@ func (sf *SnifferPlugin) printResourceTalbe() error {
 				data = append(data, []string{"Service", svc.Name, cfmt.Sprintf("IP:{{%s}}::url", ing.IP)})
 			}
 			if ing.Hostname != "" {
-				data = append(data, []string{"Service", svc.Name, cfmt.Sprintf("Host:{{%s}}::url", ing.Hostname)})
+				data = append(data, []string{"Service", svc.Name, cfmt.Sprintf("Host:{{https://%s}}::url", ing.Hostname)})
 			}
 		}
 
 	}
 	for _, ing := range sf.AllInfo.IngList.Items {
 		for _, r := range ing.Spec.Rules {
-			data = append(data, []string{"Ingress", ing.Name, cfmt.Sprintf("Host:{{%s}}::url", r.Host)})
+			data = append(data, []string{"Ingress", ing.Name, cfmt.Sprintf("Host:https://{{%s}}::url", r.Host)})
 			for _, p := range r.IngressRuleValue.HTTP.Paths {
 				data = append(data, []string{"Ingress", ing.Name, cfmt.Sprintf("Path:{{%s}}::url", p.Path)})
 				data = append(data, []string{"Ingress", ing.Name, cfmt.Sprintf("Backend:{{%s}}::yellow", p.Backend.ServiceName)})
 			}
 		}
-		data = append(data, []string{"Ingress", ing.Name, cfmt.Sprintf("Host:{{%s}}::url", ing.Status.LoadBalancer.String())})
+		for _, i := range ing.Status.LoadBalancer.Ingress {
+			if i.IP != "" {
+				data = append(data, []string{"Ingress", ing.Name, cfmt.Sprintf("LoadBalance IP:{{%s}}::url", i.IP)})
+			}
+			if i.Hostname != "" {
+				data = append(data, []string{"Ingress", ing.Name, cfmt.Sprintf("LoadBalance Host:{{https://%s}}::url", i.Hostname)})
+			}
+		}
 	}
 	for _, pvc := range sf.AllInfo.PvcList.Items {
 		data = append(data, []string{"PVC", pvc.Name, cfmt.Sprintf("StorageClass:{{%s}}::yellow", *pvc.Spec.StorageClassName)})
