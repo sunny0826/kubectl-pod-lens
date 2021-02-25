@@ -319,7 +319,11 @@ func (sf *SnifferPlugin) printResourceTalbe() error {
 		}
 		var ports string
 		for _, v := range svc.Spec.Ports {
-			ports = cfmt.Sprintf("Name:{{%s}}::yellow\nPort:{{%d}}::yellow\nTargetPort:{{%d}}::yellow", v.Name, v.Port, v.TargetPort.IntVal)
+			if v.TargetPort.IntVal == 0 {
+				ports = cfmt.Sprintf("Name:{{%s}}::yellow\nPort:{{%d}}::yellow\nTargetPort:{{%s}}::yellow", v.Name, v.Port, v.TargetPort.StrVal)
+			} else {
+				ports = cfmt.Sprintf("Name:{{%s}}::yellow\nPort:{{%d}}::yellow\nTargetPort:{{%d}}::yellow", v.Name, v.Port, v.TargetPort.IntVal)
+			}
 			data = append(data, []string{"Service", svc.Name, ports})
 		}
 		for _, ing := range svc.Status.LoadBalancer.Ingress {
