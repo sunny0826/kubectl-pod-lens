@@ -5,6 +5,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/i582/cfmt"
+
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -18,9 +20,13 @@ var (
 
 func RootCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:           "sniffer",
-		Short:         "View pod related resources.",
-		Long:          `.`,
+		Use:   "sniffer [pod name]",
+		Short: "View pod related resources.",
+		Long:  printLogo(),
+		Example: `
+# Sniffing pod-related resources
+$ kubectl sniffer prometheus-prometheus-operator-prometheus-0 
+`,
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		PreRun: func(cmd *cobra.Command, args []string) {
@@ -77,4 +83,21 @@ func InitAndExecute() {
 
 func initConfig() {
 	viper.AutomaticEnv()
+}
+
+func printLogo() string {
+	return cfmt.Sprintf(`
+{{                               /$$  /$$$$$$  /$$$$$$                   }}::red
+{{                              |__/ /$$__  $$/$$__  $$                  }}::red
+{{            /$$$$$$$ /$$$$$$$  /$$| $$  \__/ $$  \__/$$$$$$   /$$$$$$  }}::yellow
+{{           /$$_____/| $$__  $$| $$| $$$$   | $$$$  /$$__  $$ /$$__  $$ }}::yellow
+{{          |  $$$$$$ | $$  \ $$| $$| $$_/   | $$_/ | $$$$$$$$| $$  \__/ }}::blue
+{{           \____  $$| $$  | $$| $$| $$     | $$   | $$_____/| $$       }}::blue
+{{           /$$$$$$$/| $$  | $$| $$| $$     | $$   |  $$$$$$$| $$       }}::green
+{{          |_______/ |__/  |__/|__/|__/     |__/    \_______/|__/       }}::green
+
+Find related {{workloads}}::green|underline, {{namespace}}::green|underline, {{node}}::green|underline, {{service}}::green|underline, {{configmap}}::green|underline, {{secret}}::green|underline, {{ingress}}::green|underline and {{HPA}}::green|underline 
+by {{pod name}}::lightRed and display them in a {{tree}}::blue and {{table}}::blue.
+Find more information at: {{https://github.com/sunny0826/kubectl-sniffer}}::lightMagenta|underline
+`)
 }
