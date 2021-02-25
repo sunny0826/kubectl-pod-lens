@@ -290,7 +290,7 @@ func (sf *SnifferPlugin) printPodLeveledList() error {
 	}
 
 	root := pterm.NewTreeFromLeveledList(leveledList)
-	pterm.DefaultTree.WithRoot(root).Render()
+	_ = pterm.DefaultTree.WithRoot(root).Render()
 	return nil
 }
 
@@ -338,20 +338,22 @@ func (sf *SnifferPlugin) printResourceTalbe() error {
 	}
 	for _, ing := range sf.AllInfo.IngList.Items {
 		for _, r := range ing.Spec.Rules {
-			data = append(data, []string{"Ingress", ing.Name, cfmt.Sprintf("Host:https://{{%s}}::url", r.Host)})
 			for _, p := range r.IngressRuleValue.HTTP.Paths {
-				data = append(data, []string{"Ingress", ing.Name, cfmt.Sprintf("Path:{{%s}}::url", p.Path)})
+				//data = append(data, []string{"Ingress", ing.Name, cfmt.Sprintf("Host:https://{{%s}}::url", r.Host)})
+				data = append(data, []string{"Ingress", ing.Name, cfmt.Sprintf("Url:https://{{%s%s}}::url", r.Host, p.Path)})
 				data = append(data, []string{"Ingress", ing.Name, cfmt.Sprintf("Backend:{{%s}}::yellow", p.Backend.ServiceName)})
 			}
 		}
+		loadBalancesList := "LoadBalanceIP: "
 		for _, i := range ing.Status.LoadBalancer.Ingress {
 			if i.IP != "" {
-				data = append(data, []string{"Ingress", ing.Name, cfmt.Sprintf("LoadBalance IP:{{%s}}::url", i.IP)})
+				loadBalancesList += cfmt.Sprintf("{{%s}}::yellow ", i.IP)
 			}
 			if i.Hostname != "" {
-				data = append(data, []string{"Ingress", ing.Name, cfmt.Sprintf("LoadBalance Host:{{https://%s}}::url", i.Hostname)})
+				loadBalancesList += cfmt.Sprintf("{{%s}}::yellow ", i.Hostname)
 			}
 		}
+		data = append(data, []string{"Ingress", ing.Name, loadBalancesList})
 	}
 	for _, pvc := range sf.AllInfo.PvcList.Items {
 		data = append(data, []string{"PVC", pvc.Name, cfmt.Sprintf("StorageClass:{{%s}}::yellow", *pvc.Spec.StorageClassName)})
