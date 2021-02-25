@@ -5,6 +5,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 	"github.com/pkg/errors"
 	"github.com/pterm/pterm"
+	appsv1 "k8s.io/api/apps/v1"
 	autov1 "k8s.io/api/autoscaling/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/api/extensions/v1beta1"
@@ -13,16 +14,26 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"os"
+	"strings"
 )
 
+type Workload struct {
+	Type     string
+	Name     string
+	Replicas int32
+}
+
 type AllInfo struct {
-	SvcList        *v1.ServiceList
-	IngList        *v1beta1.IngressList
-	PvcList        *v1.PersistentVolumeClaimList
-	ConfigMapList  *v1.ConfigMapList
-	SecretList     *v1.SecretList
-	Hpa            *autov1.HorizontalPodAutoscaler
-	DeploymentName string
+	DeployList    *appsv1.DeploymentList
+	StsList       *appsv1.StatefulSetList
+	DsList        *appsv1.DaemonSetList
+	SvcList       *v1.ServiceList
+	IngList       *v1beta1.IngressList
+	PvcList       *v1.PersistentVolumeClaimList
+	ConfigMapList *v1.ConfigMapList
+	SecretList    *v1.SecretList
+	Hpa           *autov1.HorizontalPodAutoscaler
+	Workload      Workload
 }
 
 type SnifferPlugin struct {
@@ -75,16 +86,40 @@ func (sf *SnifferPlugin) getLabelByPod() error {
 		labelSelector = "app=" + labels["app"]
 	} else if _, ok = labels["k8s-app"]; ok {
 		labelSelector = "k8s-app=" + labels["k8s-app"]
+	} else if _, ok = labels["app.kubernetes.io/name"]; ok {
+		labelSelector = "app.kubernetes.io/name=" + labels["app.kubernetes.io/name"]
 	} else {
-		pterm.Println(pterm.Cyan("Failed to get other, These labels do not exist: ") +
-			pterm.Green("release") +
-			pterm.Cyan(",") +
-			pterm.Green("app") +
-			pterm.Cyan(",") +
-			pterm.Green("k8s-app"))
+		cfmt.Println("Failed to get other, These labels do not exist: {{[release]}}::green {{[app]}}::green {{[k8s-app]}}::green {{[app.kubernetes.io/name]}}::green")
 		os.Exit(1)
 	}
 	sf.LabelSelector = labelSelector
+	return nil
+}
+
+func (sf *SnifferPlugin) findDeployByLabel(namespace string) error {
+	deployFind, err := sf.Clientset.AppsV1().Deployments(namespace).List(metav1.ListOptions{LabelSelector: sf.LabelSelector})
+	if err != nil {
+		return err
+	}
+	sf.AllInfo.DeployList = deployFind
+	return nil
+}
+
+func (sf *SnifferPlugin) findStsByLabel(namespace string) error {
+	stsFind, err := sf.Clientset.AppsV1().StatefulSets(namespace).List(metav1.ListOptions{LabelSelector: sf.LabelSelector})
+	if err != nil {
+		return err
+	}
+	sf.AllInfo.StsList = stsFind
+	return nil
+}
+
+func (sf *SnifferPlugin) findDsByLabel(namespace string) error {
+	dsFind, err := sf.Clientset.AppsV1().DaemonSets(namespace).List(metav1.ListOptions{LabelSelector: sf.LabelSelector})
+	if err != nil {
+		return err
+	}
+	sf.AllInfo.DsList = dsFind
 	return nil
 }
 
@@ -133,8 +168,60 @@ func (sf *SnifferPlugin) findSecretByLabel(namespace string) error {
 	return nil
 }
 
-func (sf *SnifferPlugin) findDeployByRs() error {
+func (sf *SnifferPlugin) getOwnerByPod() error {
+	for _, existingOwnerRef := range sf.PodObject.GetOwnerReferences() {
+		ownerKind := strings.ToLower(existingOwnerRef.Kind)
+		switch ownerKind {
+		case "replicaset":
+			rsObject, err := sf.Clientset.AppsV1().ReplicaSets(
+				sf.PodObject.GetNamespace()).Get(
+				existingOwnerRef.Name,
+				metav1.GetOptions{})
+			if err != nil {
+				return errors.New("Failed to retrieve replica set data, AppsV1 API was not available.")
+			}
 
+			for _, own := range rsObject.GetOwnerReferences() {
+				sf.AllInfo.Workload = Workload{
+					Name:     own.Name,
+					Type:     own.Kind,
+					Replicas: rsObject.Status.Replicas,
+				}
+			}
+		case "statefulset":
+			ssObject, err := sf.Clientset.AppsV1().StatefulSets(
+				sf.PodObject.GetNamespace()).Get(
+				existingOwnerRef.Name,
+				metav1.GetOptions{})
+			if err != nil {
+				return errors.New("Failed to retrieve stateful set data, AppsV1 API was not available.")
+			}
+			sf.AllInfo.Workload = Workload{
+				Name:     existingOwnerRef.Name,
+				Type:     ownerKind,
+				Replicas: ssObject.Status.Replicas,
+			}
+		case "daemonset":
+			dsObject, err := sf.Clientset.AppsV1().DaemonSets(
+				sf.PodObject.GetNamespace()).Get(
+				existingOwnerRef.Name,
+				metav1.GetOptions{})
+			if err != nil {
+				return errors.New("Failed to retrieve daemon set data, AppsV1 API was not available.")
+			}
+			sf.AllInfo.Workload = Workload{
+				Name:     existingOwnerRef.Name,
+				Type:     ownerKind,
+				Replicas: dsObject.Status.DesiredNumberScheduled,
+			}
+		default:
+			sf.AllInfo.Workload = Workload{
+				Name:     existingOwnerRef.Name,
+				Type:     ownerKind,
+				Replicas: 0,
+			}
+		}
+	}
 	return nil
 }
 
@@ -144,7 +231,7 @@ func (sf *SnifferPlugin) findHpaByName(namespace string) error {
 		return err
 	}
 	for _, hpa := range hpaFind.Items {
-		if hpa.Spec.ScaleTargetRef.Name == sf.AllInfo.DeploymentName {
+		if hpa.Spec.ScaleTargetRef.Name == sf.AllInfo.Workload.Name {
 			sf.AllInfo.Hpa = &hpa
 		}
 	}
@@ -156,43 +243,33 @@ func (sf *SnifferPlugin) printPodLeveledList() error {
 	cfmt.RegisterStyle("pod", func(s string) string {
 		return cfmt.Sprintf("{{%s}}::green|bold", s)
 	})
-
-	leveledList = append(leveledList, pterm.LeveledListItem{Level: 0, Text: sf.PodObject.Spec.NodeName})
-	leveledList = append(leveledList, pterm.LeveledListItem{Level: 1, Text: sf.PodObject.Namespace})
-	for _, existingOwnerRef := range sf.PodObject.GetOwnerReferences() {
-		ownerKind := existingOwnerRef.Kind
-		if ownerKind == "ReplicaSet" {
-			ownerKind = "Deployment"
-			rsObject, err := sf.Clientset.AppsV1().ReplicaSets(
-				sf.PodObject.GetNamespace()).Get(
-				existingOwnerRef.Name,
-				metav1.GetOptions{})
-			if err != nil {
-				return errors.New("Failed to retrieve replica set data, AppsV1 API was not available.")
-			}
-			for _, rsOwner := range rsObject.GetOwnerReferences() {
-				sf.AllInfo.DeploymentName = rsOwner.Name
-			}
-		}
-		workloadName := existingOwnerRef.Name
-		leveledList = append(leveledList, pterm.LeveledListItem{Level: 2, Text: ownerKind})
-		leveledList = append(leveledList, pterm.LeveledListItem{Level: 3, Text: workloadName})
-	}
+	cfmt.RegisterStyle("restart", func(s string) string {
+		return cfmt.Sprintf("{{%s}}::green|bold", s)
+	})
+	//leveledList = append(leveledList, pterm.LeveledListItem{Level: 0, Text: cfmt.Sprintf("%s {{ Node }}::bgMagenta|#ffffff", sf.PodObject.Spec.NodeName)})
+	leveledList = append(leveledList, pterm.LeveledListItem{Level: 0, Text: cfmt.Sprintf("{{ [Namespace] }}::cyan|bold %s", sf.PodObject.Namespace)})
+	leveledList = append(leveledList, pterm.LeveledListItem{Level: 1, Text: cfmt.Sprintf("{{ [%s] }}::lightBlue|bold %s replica: {{%d}}::green", sf.AllInfo.Workload.Type, sf.AllInfo.Workload.Name, sf.AllInfo.Workload.Replicas)})
+	leveledList = append(leveledList, pterm.LeveledListItem{Level: 2, Text: cfmt.Sprintf("{{ [Node] }}::magenta|bold %s", sf.PodObject.Spec.NodeName)})
 	if sf.PodObject.Status.Phase != "Running" {
 		cfmt.RegisterStyle("pod", func(s string) string {
 			return cfmt.Sprintf("{{%s}}::red|bold", s)
 		})
 	}
-	podInfo := cfmt.Sprintf("{{%s}}::lightBlue|bold {{[%s]}}::pod", sf.PodObject.Name, sf.PodObject.Status.Phase)
-	leveledList = append(leveledList, pterm.LeveledListItem{Level: 4, Text: podInfo})
+	podInfo := cfmt.Sprintf("{{ [Pod] }}::blue|bold %s {{[%s]}}::pod", sf.PodObject.Name, sf.PodObject.Status.Phase)
+	leveledList = append(leveledList, pterm.LeveledListItem{Level: 3, Text: podInfo})
 	for _, val := range sf.PodObject.Status.InitContainerStatuses {
 		if val.State.Terminated.Reason != "Completed" {
 			cfmt.RegisterStyle("pod", func(s string) string {
 				return cfmt.Sprintf("{{%s}}::red|bold", s)
 			})
 		}
-		initInfo := cfmt.Sprintf("%s {{init}}::gray|bold {{[%s]}}::pod restart: %d", val.Name, val.State.Terminated.Reason, val.RestartCount)
-		leveledList = append(leveledList, pterm.LeveledListItem{Level: 5, Text: initInfo})
+		if val.RestartCount != 0 {
+			cfmt.RegisterStyle("restart", func(s string) string {
+				return cfmt.Sprintf("{{%s}}::yellow|bold", s)
+			})
+		}
+		initInfo := cfmt.Sprintf("{{ [initContainer] }}::gray|bold %s {{[%s]}}::pod restart: {{%d}}::restart", val.Name, val.State.Terminated.Reason, val.RestartCount)
+		leveledList = append(leveledList, pterm.LeveledListItem{Level: 4, Text: initInfo})
 	}
 	for _, val := range sf.PodObject.Status.ContainerStatuses {
 		state := "Ready"
@@ -202,21 +279,17 @@ func (sf *SnifferPlugin) printPodLeveledList() error {
 				return cfmt.Sprintf("{{%s}}::red|bold", s)
 			})
 		}
-		containerInfo := cfmt.Sprintf("%s {{[%s]}}::pod restart: %d", val.Name, state, val.RestartCount)
-		leveledList = append(leveledList, pterm.LeveledListItem{Level: 5, Text: containerInfo})
+		if val.RestartCount != 0 {
+			cfmt.RegisterStyle("restart", func(s string) string {
+				return cfmt.Sprintf("{{%s}}::yellow|bold", s)
+			})
+		}
+		containerInfo := cfmt.Sprintf("{{ [Container] }}::lightGreen|bold %s {{[%s]}}::pod restart: {{%d}}::restart", val.Name, state, val.RestartCount)
+		leveledList = append(leveledList, pterm.LeveledListItem{Level: 4, Text: containerInfo})
 	}
 
 	root := pterm.NewTreeFromLeveledList(leveledList)
-
-	level, _ := pterm.DefaultTree.WithRoot(root).Srender()
-	panels := pterm.Panels{
-		{{Data: "[node]\n[namespace]\n[type]\n[workload]\n[pod]\n[containers]"}, {Data: level}},
-	}
-
-	err := pterm.DefaultPanel.WithPanels(panels).WithPadding(0).Render()
-	if err != nil {
-		return err
-	}
+	pterm.DefaultTree.WithRoot(root).Render()
 	return nil
 }
 
@@ -226,6 +299,17 @@ func (sf *SnifferPlugin) printResourceTalbe() error {
 	cfmt.RegisterStyle("url", func(s string) string {
 		return cfmt.Sprintf("{{%s}}::yellow|underline", s)
 	})
+	for _, deploy := range sf.AllInfo.DeployList.Items {
+		data = append(data, []string{"Deployment", deploy.Name, cfmt.Sprintf("Replicas:{{%d}}::yellow", deploy.Status.Replicas)})
+	}
+
+	for _, sts := range sf.AllInfo.StsList.Items {
+		data = append(data, []string{"StatefulSet", sts.Name, cfmt.Sprintf("Replicas:{{%d}}::yellow", sts.Status.Replicas)})
+	}
+
+	for _, ds := range sf.AllInfo.DsList.Items {
+		data = append(data, []string{"DaemonSet", ds.Name, cfmt.Sprintf("Replicas:{{%d}}::yellow", ds.Status.DesiredNumberScheduled)})
+	}
 
 	for _, svc := range sf.AllInfo.SvcList.Items {
 		if svc.Spec.ClusterIP != "None" {
@@ -237,6 +321,15 @@ func (sf *SnifferPlugin) printResourceTalbe() error {
 			ports = cfmt.Sprintf("Name:{{%s}}::yellow\nPort:{{%d}}::yellow\nTargetPort:{{%d}}::yellow", v.Name, v.Port, v.TargetPort.IntVal)
 			data = append(data, []string{"Service", svc.Name, ports})
 		}
+		for _, ing := range svc.Status.LoadBalancer.Ingress {
+			if ing.IP != "" {
+				data = append(data, []string{"Service", svc.Name, cfmt.Sprintf("IP:{{%s}}::url", ing.IP)})
+			}
+			if ing.Hostname != "" {
+				data = append(data, []string{"Service", svc.Name, cfmt.Sprintf("Host:{{%s}}::url", ing.Hostname)})
+			}
+		}
+
 	}
 	for _, ing := range sf.AllInfo.IngList.Items {
 		for _, r := range ing.Spec.Rules {
@@ -246,6 +339,7 @@ func (sf *SnifferPlugin) printResourceTalbe() error {
 				data = append(data, []string{"Ingress", ing.Name, cfmt.Sprintf("Backend:{{%s}}::yellow", p.Backend.ServiceName)})
 			}
 		}
+		data = append(data, []string{"Ingress", ing.Name, cfmt.Sprintf("Host:{{%s}}::url", ing.Status.LoadBalancer.String())})
 	}
 	for _, pvc := range sf.AllInfo.PvcList.Items {
 		data = append(data, []string{"PVC", pvc.Name, cfmt.Sprintf("StorageClass:{{%s}}::yellow", *pvc.Spec.StorageClassName)})
@@ -267,11 +361,10 @@ func (sf *SnifferPlugin) printResourceTalbe() error {
 
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"Kind", "Name", "Details"})
-	//table.SetFooter([]string{"", "", "Total", "$146.93"})
 	table.SetAutoMergeCells(true)
 	table.SetRowLine(true)
 	table.AppendBulk(data)
-	table.SetCaption(true, "Movie ratings.")
+	//table.SetCaption(true, "Movie ratings.")
 	table.Render()
 	return nil
 }
@@ -288,11 +381,27 @@ func RunPlugin(configFlags *genericclioptions.ConfigFlags, outputCh chan string)
 		return err
 	}
 
+	if err := sf.getOwnerByPod(); err != nil {
+		return err
+	}
+
 	if err = sf.printPodLeveledList(); err != nil {
 		return err
 	}
 
 	if err = sf.getLabelByPod(); err != nil {
+		return err
+	}
+
+	if err = sf.findDeployByLabel(sf.PodObject.Namespace); err != nil {
+		return err
+	}
+
+	if err = sf.findStsByLabel(sf.PodObject.Namespace); err != nil {
+		return err
+	}
+
+	if err = sf.findDsByLabel(sf.PodObject.Namespace); err != nil {
 		return err
 	}
 

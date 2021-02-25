@@ -17,6 +17,7 @@ require (
 	github.com/onsi/gomega v1.5.0 // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pkg/errors v0.8.1
+	github.com/prometheus/common v0.4.0
 	github.com/pterm/pterm v0.12.8
 	github.com/spf13/cobra v0.0.4
 	github.com/spf13/viper v1.4.0
