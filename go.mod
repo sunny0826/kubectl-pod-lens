@@ -11,13 +11,13 @@ require (
 	github.com/i582/cfmt v1.0.7
 	github.com/imdario/mergo v0.3.7 // indirect
 	github.com/json-iterator/go v1.1.6 // indirect
+	github.com/mattn/go-colorable v0.1.8 // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/onsi/ginkgo v1.8.0 // indirect
 	github.com/onsi/gomega v1.5.0 // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pkg/errors v0.8.1
-	github.com/prometheus/common v0.4.0
 	github.com/pterm/pterm v0.12.8
 	github.com/spf13/cobra v0.0.4
 	github.com/spf13/viper v1.4.0
