@@ -25,7 +25,6 @@ The plugin can display pod-related:
 - Krew 0.4.0+
 
 ## Installation
-The following assumes you have the plugin installed via
 
 ```shell
 kubectl krew install sniffer
