@@ -340,7 +340,7 @@ func (sf *SnifferPlugin) printResourceTalbe() error {
 		for _, r := range ing.Spec.Rules {
 			for _, p := range r.IngressRuleValue.HTTP.Paths {
 				//data = append(data, []string{"Ingress", ing.Name, cfmt.Sprintf("Host:https://{{%s}}::url", r.Host)})
-				data = append(data, []string{"Ingress", ing.Name, cfmt.Sprintf("Url:https://{{%s%s}}::url", r.Host, p.Path)})
+				data = append(data, []string{"Ingress", ing.Name, cfmt.Sprintf("Url:{{https://%s%s}}::url", r.Host, p.Path)})
 				data = append(data, []string{"Ingress", ing.Name, cfmt.Sprintf("Backend:{{%s}}::yellow", p.Backend.ServiceName)})
 			}
 		}
