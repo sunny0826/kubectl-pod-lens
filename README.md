@@ -95,11 +95,11 @@ $ kubectl sniffer thanos-query-9fbb8c4bc-5x2zf
 |            |                                          | Port:10902                                        |
 |            |                                          | TargetPort:http                                   |
 +------------+------------------------------------------+---------------------------------------------------+
-| Ingress    | thanos-query-http                        | Url:https://xxxx.sniffer.io/ |
+| Ingress    | thanos-query-http                        | Url:https://xxxx.sniffer.io/                      |
 +            +                                          +---------------------------------------------------+
 |            |                                          | Backend:thanos-query-http                         |
 +            +                                          +---------------------------------------------------+
-|            |                                          | Url:https://thanos.xxxx.sniffer.io/                |
+|            |                                          | Url:https://thanos.xxxx.sniffer.io/               |
 +            +                                          +---------------------------------------------------+
 |            |                                          | Backend:thanos-query-http                         |
 +            +                                          +---------------------------------------------------+
