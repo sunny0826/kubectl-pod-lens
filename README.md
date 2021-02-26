@@ -1,6 +1,5 @@
 # sniffer kubectl
 
-![Go](https://github.com/sunny0826/kubectl-sniffer/workflows/Go/badge.svg?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/sunny0826/kubectl-sniffer)](https://goreportcard.com/report/github.com/sunny0826/kubectl-sniffer)
 ![GitHub](https://img.shields.io/github/license/sunny0826/kubectl-sniffer.svg)
 [![GitHub release](https://img.shields.io/github/release/sunny0826/kubectl-sniffer)](https://github.com/sunny0826/kubectl-sniffer/releases)
