@@ -4,6 +4,9 @@
 ![GitHub](https://img.shields.io/github/license/sunny0826/kubectl-sniffer.svg)
 [![GitHub release](https://img.shields.io/github/release/sunny0826/kubectl-sniffer)](https://github.com/sunny0826/kubectl-sniffer/releases)
 
+[comment]: <> (![]&#40;doc/logo.png&#41;)
+<img src="https://github.com/sunny0826/kubectl-sniffer/doc/logo.png" width="100">
+
 `kubectl-sniffer` is a [kubectl plugin](https://kubernetes.io/docs/tasks/extend-kubectl/kubectl-plugins/) that show pod-related resource information.
 
 The plugin can display pod-related:
@@ -16,36 +19,6 @@ The plugin can display pod-related:
 * Secret
 * HPA
 
-
-```text
-                               /$$  /$$$$$$  /$$$$$$                   
-                              |__/ /$$__  $$/$$__  $$                  
-            /$$$$$$$ /$$$$$$$  /$$| $$  \__/ $$  \__/$$$$$$   /$$$$$$  
-           /$$_____/| $$__  $$| $$| $$$$   | $$$$  /$$__  $$ /$$__  $$ 
-          |  $$$$$$ | $$  \ $$| $$| $$_/   | $$_/ | $$$$$$$$| $$  \__/ 
-           \____  $$| $$  | $$| $$| $$     | $$   | $$_____/| $$       
-           /$$$$$$$/| $$  | $$| $$| $$     | $$   |  $$$$$$$| $$       
-          |_______/ |__/  |__/|__/|__/     |__/    \_______/|__/       
-
-Find related workloads, namespace, node, service, configmap, secret, ingress and HPA 
-by pod name and display them in a tree and table.
-Find more information at: https://github.com/sunny0826/kubectl-sniffer
-
-Usage:
-  kubectl sniffer [pod name] [flags]
-
-Examples:
-
-# Sniffing pod-related resources
-$ kubectl sniffer prometheus-prometheus-operator-prometheus-0 
-
-
-Flags:
-      --context string     The name of the kubeconfig context to use
-  -h, --help               help for sniffer
-  -n, --namespace string   If present, the namespace scope for this CLI request
-
-```
 ## Requirements
 
 - Kubernetes 1.10.0+
