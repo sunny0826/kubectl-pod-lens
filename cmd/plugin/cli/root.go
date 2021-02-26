@@ -20,7 +20,7 @@ var (
 
 func RootCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "sniffer [pod name]",
+		Use:   "kubectl sniffer [pod name]",
 		Short: "View pod related resources.",
 		Long:  printLogo(),
 		Example: `
