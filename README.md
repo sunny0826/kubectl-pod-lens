@@ -1,4 +1,4 @@
-# sniffer kubectl
+# Kubectl Sniffer
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/sunny0826/kubectl-sniffer)](https://goreportcard.com/report/github.com/sunny0826/kubectl-sniffer)
 ![GitHub](https://img.shields.io/github/license/sunny0826/kubectl-sniffer.svg)
