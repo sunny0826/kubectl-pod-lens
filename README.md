@@ -122,3 +122,7 @@ $ kubectl sniffer thanos-query-9fbb8c4bc-5x2zf
 ## Reference
 
 - [Kubectl Plugins](https://kubernetes.io/docs/tasks/extend-kubectl/kubectl-plugins/)
+
+## Design
+
+![](doc/architecture.jpg)
