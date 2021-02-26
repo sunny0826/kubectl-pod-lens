@@ -1,0 +1,50 @@
+apiVersion: krew.googlecontainertools.github.com/v1alpha2
+kind: Plugin
+metadata:
+  name: sniffer
+spec:
+  version: {{ .TagName }}
+  platforms:
+    - selector:
+        matchLabels:
+          os: darwin
+          arch: amd64
+      {{addURIAndSha "https://github.com/sunny0826/kubectl-sniffer/releases/download/{{ .TagName }}/sniffer_{{ .TagName }}_darwin_amd64.tar.gz" .TagName }}
+      - from: "./sniffer"
+          to: "."
+            - from: LICENSE
+              to: "."
+      bin: sniffer
+    - selector:
+        matchLabels:
+          os: linux
+          arch: amd64
+      {{addURIAndSha "https://github.com/rajatjindal/kubectl-evict-pod/releases/download/{{ .TagName }}/sniffer_{{ .TagName }}_linux_amd64.tar.gz" .TagName }}
+      files:
+        - from: "./sniffer"
+          to: "."
+        - from: LICENSE
+          to: "."
+      bin: sniffer
+    - selector:
+        matchLabels:
+          os: windows
+          arch: amd64
+        {{addURIAndSha "https://github.com/rajatjindal/kubectl-evict-pod/releases/download/{{ .TagName }}/sniffer_{{ .TagName }}_windows_amd64.zip" .TagName }}
+        files:
+          - from: "/sniffer.exe"
+            to: "."
+          - from: LICENSE
+            to: "."
+        bin: "sniffer.exe"
+  shortDescription: Sniffing pod-related resources
+  homepage: https://github.com/sunny0826/kubectl-sniffer
+  description: |
+    Find related workloads, namespace, node, service, configmap, secret, ingress and HPA by pod name and display them in a tree and table.
+
+    Usage:
+          $ kubectl sniffer [pod name]
+
+        For additional options:
+          $ kubectl sniffer --help
+          or https://github.com/sunny0826/kubectl-sniffer
