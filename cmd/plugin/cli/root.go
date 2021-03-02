@@ -5,6 +5,8 @@ import (
 	"os"
 	"strings"
 
+	"k8s.io/klog"
+
 	"github.com/i582/cfmt"
 
 	"github.com/pkg/errors"
@@ -54,6 +56,7 @@ $ kubectl sniffer prometheus-prometheus-operator-prometheus-0
 	KubernetesConfigFlags = genericclioptions.NewConfigFlags(false)
 	KubernetesConfigFlags.AddFlags(cmd.Flags())
 
+	klog.InitFlags(nil)
 	_ = cmd.Flags().MarkHidden("as-group")
 	_ = cmd.Flags().MarkHidden("as")
 	_ = cmd.Flags().MarkHidden("cache-dir")

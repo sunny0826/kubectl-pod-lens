@@ -1,13 +1,14 @@
 package plugin
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
 	mapset "github.com/deckarep/golang-set"
+	"github.com/gosuri/uitable"
 
 	"github.com/i582/cfmt"
-	"github.com/olekukonko/tablewriter"
 	"github.com/pkg/errors"
 	"github.com/pterm/pterm"
 	appsv1 "k8s.io/api/apps/v1"
@@ -70,7 +71,8 @@ func (sf *SnifferPlugin) findPodByName(name string, namespace string) error {
 	// we will seek the whole cluster if namespace is not passed as a flag (it will be a "" string)
 	podFind, err := sf.Clientset.CoreV1().Pods(namespace).List(metav1.ListOptions{FieldSelector: podFieldSelector})
 	if err != nil || len(podFind.Items) == 0 {
-		return errors.New("Failed to get pod: [" + name + "], please check your parameters, set a context or verify API server.")
+		return errors.New("Failed to get pod: [" +
+			name + "], please check your parameters, set a context or verify API server.")
 	}
 
 	sf.PodObject = &podFind.Items[0]
@@ -92,7 +94,11 @@ func (sf *SnifferPlugin) getLabelByPod() error {
 	} else if _, ok = labels["app.kubernetes.io/name"]; ok {
 		labelSelector = "app.kubernetes.io/name=" + labels["app.kubernetes.io/name"]
 	} else {
-		_, _ = cfmt.Println("Failed to get other, These labels do not exist: {{[release]}}::green {{[app]}}::green {{[k8s-app]}}::green {{[app.kubernetes.io/name]}}::green")
+		_, _ = cfmt.Println("Failed to get other, These labels do not exist:" +
+			" {{[release]}}::green" +
+			" {{[app]}}::green" +
+			" {{[k8s-app]}}::green" +
+			" {{[app.kubernetes.io/name]}}::green")
 		os.Exit(1)
 	}
 	sf.LabelSelector = labelSelector
@@ -345,91 +351,122 @@ func (sf *SnifferPlugin) printPodLeveledList() error {
 }
 
 func (sf *SnifferPlugin) printResourceTalbe() error {
-	var data [][]string
+	cfmt.Println("{{ Related Resources }}::bgCyan|#ffffff")
+	table := uitable.New()
+	table.MaxColWidth = 80
+	table.Wrap = true
+	table.AddRow("")
+	//fmt.Println(strings.Repeat("-", 80))
 
 	cfmt.RegisterStyle("url", func(s string) string {
 		return cfmt.Sprintf("{{%s}}::yellow|underline", s)
 	})
 	for _, deploy := range sf.AllInfo.DeployList.Items {
-		data = append(data, []string{"Deployment", deploy.Name, cfmt.Sprintf("Replicas:{{%d}}::yellow", deploy.Status.Replicas)})
+		table.AddRow("Kind:", cfmt.Sprintf("{{Deployment}}::bgLightBlue|#ffffff"))
+		table.AddRow("Name:", deploy.Name)
+		table.AddRow("Replicas:", cfmt.Sprintf("{{%d}}::yellow", deploy.Status.Replicas))
+		table.AddRow("---", "---")
 	}
 
 	for _, sts := range sf.AllInfo.StsList.Items {
-		data = append(data, []string{"StatefulSet", sts.Name, cfmt.Sprintf("Replicas:{{%d}}::yellow", sts.Status.Replicas)})
+		table.AddRow("Kind:", cfmt.Sprintf("{{ StatefulSet }}::bgLightBlue|#ffffff"))
+		table.AddRow("Name:", sts.Name)
+		table.AddRow("Replicas:", cfmt.Sprintf("{{%d}}::yellow", sts.Status.Replicas))
+		table.AddRow("---", "---")
 	}
 
 	for _, ds := range sf.AllInfo.DsList.Items {
-		data = append(data, []string{"DaemonSet", ds.Name, cfmt.Sprintf("Replicas:{{%d}}::yellow", ds.Status.DesiredNumberScheduled)})
+		table.AddRow("Kind:", cfmt.Sprintf("{{ DaemonSet }}::bgLightBlue|#ffffff"))
+		table.AddRow("Name:", ds.Name)
+		table.AddRow("Replicas:", cfmt.Sprintf("{{%d}}::yellow", ds.Status.DesiredNumberScheduled))
+		table.AddRow("---", "---")
 	}
 
 	for _, svc := range sf.AllInfo.SvcList.Items {
+		table.AddRow("Kind:", cfmt.Sprintf("{{ Service }}::bgLightYellow|black"))
+		table.AddRow("Name:", svc.Name)
 		if svc.Spec.ClusterIP != "None" {
-			detail := cfmt.Sprintf("ClusterIP:{{%s}}::yellow", svc.Spec.ClusterIP)
-			data = append(data, []string{"Service", svc.Name, detail})
+			table.AddRow("Cluster IP:", cfmt.Sprintf("{{%s}}::yellow", svc.Spec.ClusterIP))
 		}
 		var ports string
+		table.AddRow("Ports", "")
 		for _, v := range svc.Spec.Ports {
 			if v.TargetPort.IntVal == 0 {
-				ports = cfmt.Sprintf("Name:{{%s}}::yellow\nPort:{{%d}}::yellow\nTargetPort:{{%s}}::yellow", v.Name, v.Port, v.TargetPort.StrVal)
+				ports = cfmt.Sprintf("---\nName: {{%s}}::yellow\nPort: {{%d}}::yellow\nTargetPort: {{%s}}::yellow",
+					v.Name, v.Port, v.TargetPort.StrVal)
 			} else {
-				ports = cfmt.Sprintf("Name:{{%s}}::yellow\nPort:{{%d}}::yellow\nTargetPort:{{%d}}::yellow", v.Name, v.Port, v.TargetPort.IntVal)
+				ports = cfmt.Sprintf("---\nName: {{%s}}::yellow\nPort: {{%d}}::yellow\nTargetPort: {{%d}}::yellow",
+					v.Name, v.Port, v.TargetPort.IntVal)
 			}
-			data = append(data, []string{"Service", svc.Name, ports})
+			table.AddRow("", ports)
 		}
 		for _, ing := range svc.Status.LoadBalancer.Ingress {
 			if ing.IP != "" {
-				data = append(data, []string{"Service", svc.Name, cfmt.Sprintf("IP:{{%s}}::url", ing.IP)})
+				table.AddRow("IP:", cfmt.Sprintf("{{%s}}::url", ing.IP))
 			}
 			if ing.Hostname != "" {
-				data = append(data, []string{"Service", svc.Name, cfmt.Sprintf("Host:{{https://%s}}::url", ing.Hostname)})
+				table.AddRow("Host:", cfmt.Sprintf("{{%s}}::url", ing.Hostname))
 			}
-		}
 
+		}
+		table.AddRow("---", "---")
 	}
 	for _, ing := range sf.AllInfo.IngList.Items {
+		table.AddRow("Kind:", cfmt.Sprintf("{{ Ingress }}::bgGreen|#ffffff"))
+		table.AddRow("Name:", ing.Name)
 		for _, r := range ing.Spec.Rules {
 			for _, p := range r.IngressRuleValue.HTTP.Paths {
-				//data = append(data, []string{"Ingress", ing.Name, cfmt.Sprintf("Host:https://{{%s}}::url", r.Host)})
-				data = append(data, []string{"Ingress", ing.Name, cfmt.Sprintf("Url:{{https://%s%s}}::url", r.Host, p.Path)})
-				data = append(data, []string{"Ingress", ing.Name, cfmt.Sprintf("Backend:{{%s}}::yellow", p.Backend.ServiceName)})
+				table.AddRow("Url:", cfmt.Sprintf("{{https://%s%s}}::url",
+					r.Host, p.Path))
+				table.AddRow("Backend:", p.Backend.ServiceName)
 			}
 		}
-		loadBalancesList := "LoadBalanceIP: "
+		var loadBalancesList string
 		for _, i := range ing.Status.LoadBalancer.Ingress {
 			if i.IP != "" {
-				loadBalancesList += cfmt.Sprintf("{{%s}}::yellow ", i.IP)
+				loadBalancesList += cfmt.Sprintf("\n{{%s}}::lightGreen", i.IP)
 			}
 			if i.Hostname != "" {
-				loadBalancesList += cfmt.Sprintf("{{%s}}::yellow ", i.Hostname)
+				loadBalancesList += cfmt.Sprintf("\n{{%s}}::lightGreen", i.Hostname)
 			}
 		}
-		data = append(data, []string{"Ingress", ing.Name, loadBalancesList})
+		table.AddRow("LoadBalance IP:", loadBalancesList)
+		table.AddRow("---")
 	}
 	for _, pvc := range sf.AllInfo.PvcList.Items {
-		data = append(data, []string{"PVC", pvc.Name, cfmt.Sprintf("StorageClass:{{%s}}::yellow", *pvc.Spec.StorageClassName)})
-		data = append(data, []string{"PVC", pvc.Name, cfmt.Sprintf("AccessModes:{{%s}}::yellow", string(pvc.Spec.AccessModes[0]))})
+		table.AddRow("Kind:", cfmt.Sprintf("{{ PVC }}::bgGray|#ffffff"))
+		table.AddRow("Name:", pvc.Name)
+		table.AddRow("Storage Class:", cfmt.Sprintf("{{%s}}::lightGreen",
+			*pvc.Spec.StorageClassName))
+		table.AddRow("Access Modes:", cfmt.Sprintf("{{%s}}::lightGreen",
+			string(pvc.Spec.AccessModes[0])))
 		pvcSize := pvc.Spec.Resources.Requests[v1.ResourceStorage]
-		data = append(data, []string{"PVC", pvc.Name, cfmt.Sprintf("Size:{{%s}}::yellow", pvcSize.String())})
-		data = append(data, []string{"PV", pvc.Spec.VolumeName, ""})
+		table.AddRow("Size:", cfmt.Sprintf("{{%s}}::lightGreen",
+			pvcSize.String()))
+		table.AddRow("PV Name:", pvc.Spec.VolumeName)
+		table.AddRow("---", "---")
 	}
 	for _, conf := range sf.AllInfo.ConfigMapList.Items {
-		data = append(data, []string{"ConfigMap", conf.Name, ""})
+		table.AddRow("Kind:", cfmt.Sprintf("{{ ConfigMap }}::bgMagenta|#ffffff"))
+		table.AddRow("Name:", conf.Name)
+		table.AddRow("---", "---")
 	}
 	for _, sec := range sf.AllInfo.SecretList.Items {
-		data = append(data, []string{"Secrets", sec.Name, ""})
+		table.AddRow("Kind:", cfmt.Sprintf("{{ Secrets }}::bgRed|#ffffff"))
+		table.AddRow("Name:", sec.Name)
+		table.AddRow("---", "---")
 	}
 	if sf.AllInfo.Hpa != nil {
-		data = append(data, []string{"HPA", sf.AllInfo.Hpa.Name, cfmt.Sprintf("MIN:{{%d}}::yellow", *sf.AllInfo.Hpa.Spec.MinReplicas)})
-		data = append(data, []string{"HPA", sf.AllInfo.Hpa.Name, cfmt.Sprintf("MAX:{{%d}}::yellow", sf.AllInfo.Hpa.Spec.MaxReplicas)})
+		table.AddRow("Kind:", cfmt.Sprintf("{{ HPA }}::bgCyan|#ffffff"))
+		table.AddRow("Name:", sf.AllInfo.Hpa.Name)
+		table.AddRow("MIN:", cfmt.Sprintf("{{%d}}::lightGreen",
+			*sf.AllInfo.Hpa.Spec.MinReplicas))
+		table.AddRow("MAX:", cfmt.Sprintf("{{%d}}::lightGreen",
+			sf.AllInfo.Hpa.Spec.MaxReplicas))
+		table.AddRow("---", "---")
 	}
 
-	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"Kind", "Name", "Details"})
-	table.SetAutoMergeCells(true)
-	table.SetRowLine(true)
-	table.AppendBulk(data)
-	//table.SetCaption(true, "Movie ratings.")
-	table.Render()
+	fmt.Println(table)
 	return nil
 }
 
