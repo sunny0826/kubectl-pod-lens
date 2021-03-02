@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	cloud.google.com/go v0.36.0 // indirect
+	github.com/deckarep/golang-set v1.7.1
 	github.com/evanphx/json-patch v4.5.0+incompatible // indirect
 	github.com/fatih/color v1.7.0
 	github.com/google/gofuzz v1.0.0 // indirect

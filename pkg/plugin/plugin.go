@@ -4,6 +4,8 @@ import (
 	"os"
 	"strings"
 
+	mapset "github.com/deckarep/golang-set"
+
 	"github.com/i582/cfmt"
 	"github.com/olekukonko/tablewriter"
 	"github.com/pkg/errors"
@@ -98,7 +100,8 @@ func (sf *SnifferPlugin) getLabelByPod() error {
 }
 
 func (sf *SnifferPlugin) findDeployByLabel(namespace string) error {
-	deployFind, err := sf.Clientset.AppsV1().Deployments(namespace).List(metav1.ListOptions{LabelSelector: sf.LabelSelector})
+	deployFind, err := sf.Clientset.AppsV1().Deployments(namespace).List(
+		metav1.ListOptions{LabelSelector: sf.LabelSelector})
 	if err != nil {
 		return err
 	}
@@ -107,7 +110,8 @@ func (sf *SnifferPlugin) findDeployByLabel(namespace string) error {
 }
 
 func (sf *SnifferPlugin) findStsByLabel(namespace string) error {
-	stsFind, err := sf.Clientset.AppsV1().StatefulSets(namespace).List(metav1.ListOptions{LabelSelector: sf.LabelSelector})
+	stsFind, err := sf.Clientset.AppsV1().StatefulSets(namespace).List(
+		metav1.ListOptions{LabelSelector: sf.LabelSelector})
 	if err != nil {
 		return err
 	}
@@ -116,7 +120,8 @@ func (sf *SnifferPlugin) findStsByLabel(namespace string) error {
 }
 
 func (sf *SnifferPlugin) findDsByLabel(namespace string) error {
-	dsFind, err := sf.Clientset.AppsV1().DaemonSets(namespace).List(metav1.ListOptions{LabelSelector: sf.LabelSelector})
+	dsFind, err := sf.Clientset.AppsV1().DaemonSets(namespace).List(
+		metav1.ListOptions{LabelSelector: sf.LabelSelector})
 	if err != nil {
 		return err
 	}
@@ -125,7 +130,8 @@ func (sf *SnifferPlugin) findDsByLabel(namespace string) error {
 }
 
 func (sf *SnifferPlugin) findSvcByLabel(namespace string) error {
-	svcFind, err := sf.Clientset.CoreV1().Services(namespace).List(metav1.ListOptions{LabelSelector: sf.LabelSelector})
+	svcFind, err := sf.Clientset.CoreV1().Services(namespace).List(
+		metav1.ListOptions{LabelSelector: sf.LabelSelector})
 	if err != nil {
 		return err
 	}
@@ -134,7 +140,8 @@ func (sf *SnifferPlugin) findSvcByLabel(namespace string) error {
 }
 
 func (sf *SnifferPlugin) findIngressByLabel(namespace string) error {
-	ingFind, err := sf.Clientset.ExtensionsV1beta1().Ingresses(namespace).List(metav1.ListOptions{LabelSelector: sf.LabelSelector})
+	ingFind, err := sf.Clientset.ExtensionsV1beta1().Ingresses(namespace).List(
+		metav1.ListOptions{LabelSelector: sf.LabelSelector})
 	if err != nil {
 		return err
 	}
@@ -143,7 +150,8 @@ func (sf *SnifferPlugin) findIngressByLabel(namespace string) error {
 }
 
 func (sf *SnifferPlugin) findPVCByLabel(namespace string) error {
-	pvcFind, err := sf.Clientset.CoreV1().PersistentVolumeClaims(namespace).List(metav1.ListOptions{LabelSelector: sf.LabelSelector})
+	pvcFind, err := sf.Clientset.CoreV1().PersistentVolumeClaims(namespace).List(
+		metav1.ListOptions{LabelSelector: sf.LabelSelector})
 	if err != nil {
 		return err
 	}
@@ -152,7 +160,8 @@ func (sf *SnifferPlugin) findPVCByLabel(namespace string) error {
 }
 
 func (sf *SnifferPlugin) findConfigMapByLabel(namespace string) error {
-	configMapFind, err := sf.Clientset.CoreV1().ConfigMaps(namespace).List(metav1.ListOptions{LabelSelector: sf.LabelSelector})
+	configMapFind, err := sf.Clientset.CoreV1().ConfigMaps(namespace).List(
+		metav1.ListOptions{LabelSelector: sf.LabelSelector})
 	if err != nil {
 		return err
 	}
@@ -161,7 +170,8 @@ func (sf *SnifferPlugin) findConfigMapByLabel(namespace string) error {
 }
 
 func (sf *SnifferPlugin) findSecretByLabel(namespace string) error {
-	secretFind, err := sf.Clientset.CoreV1().Secrets(namespace).List(metav1.ListOptions{LabelSelector: sf.LabelSelector})
+	secretFind, err := sf.Clientset.CoreV1().Secrets(namespace).List(
+		metav1.ListOptions{LabelSelector: sf.LabelSelector})
 	if err != nil {
 		return err
 	}
@@ -227,7 +237,8 @@ func (sf *SnifferPlugin) getOwnerByPod() error {
 }
 
 func (sf *SnifferPlugin) findHpaByName(namespace string) error {
-	hpaFind, err := sf.Clientset.AutoscalingV1().HorizontalPodAutoscalers(namespace).List(metav1.ListOptions{})
+	hpaFind, err := sf.Clientset.AutoscalingV1().HorizontalPodAutoscalers(namespace).List(
+		metav1.ListOptions{})
 	if err != nil {
 		return err
 	}
@@ -247,16 +258,20 @@ func (sf *SnifferPlugin) printPodLeveledList() error {
 	cfmt.RegisterStyle("restart", func(s string) string {
 		return cfmt.Sprintf("{{%s}}::green|bold", s)
 	})
-	//leveledList = append(leveledList, pterm.LeveledListItem{Level: 0, Text: cfmt.Sprintf("%s {{ Node }}::bgMagenta|#ffffff", sf.PodObject.Spec.NodeName)})
-	leveledList = append(leveledList, pterm.LeveledListItem{Level: 0, Text: cfmt.Sprintf("{{ [Namespace] }}::cyan|bold %s", sf.PodObject.Namespace)})
-	leveledList = append(leveledList, pterm.LeveledListItem{Level: 1, Text: cfmt.Sprintf("{{ [%s] }}::lightBlue|bold %s replica: {{%d}}::green", sf.AllInfo.Workload.Type, sf.AllInfo.Workload.Name, sf.AllInfo.Workload.Replicas)})
-	leveledList = append(leveledList, pterm.LeveledListItem{Level: 2, Text: cfmt.Sprintf("{{ [Node] }}::magenta|bold %s", sf.PodObject.Spec.NodeName)})
+	leveledList = append(leveledList, pterm.LeveledListItem{Level: 0,
+		Text: cfmt.Sprintf("{{ [Namespace] }}::cyan|bold %s", sf.PodObject.Namespace)})
+	leveledList = append(leveledList, pterm.LeveledListItem{Level: 1,
+		Text: cfmt.Sprintf("{{ [%s] }}::lightBlue|bold %s replica: {{%d}}::green",
+			sf.AllInfo.Workload.Type, sf.AllInfo.Workload.Name, sf.AllInfo.Workload.Replicas)})
+	leveledList = append(leveledList, pterm.LeveledListItem{Level: 2,
+		Text: cfmt.Sprintf("{{ [Node] }}::magenta|bold %s", sf.PodObject.Spec.NodeName)})
 	if sf.PodObject.Status.Phase != "Running" {
 		cfmt.RegisterStyle("pod", func(s string) string {
 			return cfmt.Sprintf("{{%s}}::red|bold", s)
 		})
 	}
-	podInfo := cfmt.Sprintf("{{ [Pod] }}::blue|bold %s {{[%s]}}::pod", sf.PodObject.Name, sf.PodObject.Status.Phase)
+	podInfo := cfmt.Sprintf("{{ [Pod] }}::blue|bold %s {{[%s]}}::pod",
+		sf.PodObject.Name, sf.PodObject.Status.Phase)
 	leveledList = append(leveledList, pterm.LeveledListItem{Level: 3, Text: podInfo})
 	for _, val := range sf.PodObject.Status.InitContainerStatuses {
 		if val.State.Terminated.Reason != "Completed" {
@@ -288,7 +303,42 @@ func (sf *SnifferPlugin) printPodLeveledList() error {
 		containerInfo := cfmt.Sprintf("{{ [Container] }}::lightGreen|bold %s {{[%s]}}::pod restart: {{%d}}::restart", val.Name, state, val.RestartCount)
 		leveledList = append(leveledList, pterm.LeveledListItem{Level: 4, Text: containerInfo})
 	}
-
+	for _, val := range sf.PodObject.Spec.Volumes {
+		secretList := mapset.NewSet()
+		configmapList := mapset.NewSet()
+		pvcList := mapset.NewSet()
+		if val.Projected != nil {
+			for _, i := range val.Projected.Sources {
+				if i.Secret != nil {
+					secretList.Add(i.Secret.Name)
+				}
+				if i.ConfigMap != nil {
+					configmapList.Add(i.ConfigMap.Name)
+				}
+			}
+		}
+		if val.ConfigMap != nil {
+			configmapList.Add(val.ConfigMap.Name)
+		}
+		if val.Secret != nil {
+			secretList.Add(val.Secret.SecretName)
+		}
+		if val.PersistentVolumeClaim != nil {
+			pvcList.Add(val.PersistentVolumeClaim.ClaimName)
+		}
+		for _, p := range pvcList.ToSlice() {
+			leveledList = append(leveledList, pterm.LeveledListItem{Level: 2,
+				Text: cfmt.Sprintf("{{ [PVC] }}::yellow|bold %s", p)})
+		}
+		for _, c := range configmapList.ToSlice() {
+			leveledList = append(leveledList, pterm.LeveledListItem{Level: 2,
+				Text: cfmt.Sprintf("{{ [ConfigMap] }}::lightMagenta|bold %s", c)})
+		}
+		for _, s := range secretList.ToSlice() {
+			leveledList = append(leveledList, pterm.LeveledListItem{Level: 2,
+				Text: cfmt.Sprintf("{{ [Secret] }}::red|bold %s", s)})
+		}
+	}
 	root := pterm.NewTreeFromLeveledList(leveledList)
 	_ = pterm.DefaultTree.WithRoot(root).Render()
 	return nil
