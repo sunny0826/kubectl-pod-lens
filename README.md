@@ -32,7 +32,7 @@ $ kubectl krew install sniffer
 
 ## Example
 
-```console
+```bash
 $ kubectl sniffer thanos-query-9fbb8c4bc-5x2zf
 └─┬ [Namespace]  kube-system                                                                            
   └─┬ [Deployment]  thanos-query                                    Replica: 2/2                        
