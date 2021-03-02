@@ -27,64 +27,126 @@ The plugin can display pod-related:
 ## Installation
 
 ```shell
-kubectl krew install sniffer
+$ kubectl krew install sniffer
 ```
 
 ## Example
 
-```bash
+```console
 $ kubectl sniffer thanos-query-9fbb8c4bc-5x2zf
-└─┬ [Namespace]  kube-system
-  └─┬ [Deployment]  thanos-query replica: 2
-    └─┬ [Node]  ip-172-25-204-130.cn-northwest-1.compute.internal
-      └─┬ [Pod]  thanos-query-9fbb8c4bc-5x2zf [Running]
-        └── [Container]  thanos-query [Ready] restart: 0
+└─┬ [Namespace]  kube-system                                                                            
+  └─┬ [Deployment]  thanos-query                                    Replica: 2/2                        
+    ├─┬ [Node]  ip-172-25-204-130.cn-northwest-1.compute.internal   [Ready] Node IP: 172.25.204.130     
+    │ └─┬ [Pod]  thanos-query-9fbb8c4bc-5x2zf                       [Running] Pod IP: 100.123.170.122   
+    │   └── [Container]  thanos-query                               [Running] Restart: 0                
+    └── [Secret]  default-token-7rrxp                                                                   
 
-+------------+------------------------------------------+---------------------------------------+
-|    KIND    |                   NAME                   |                DETAILS                |
-+------------+------------------------------------------+---------------------------------------+
-| Deployment | thanos-bucket                            | Replicas:1                            |
-+            +------------------------------------------+                                       +
-|            | thanos-compact                           |                                       |
-+            +------------------------------------------+---------------------------------------+
-|            | thanos-query                             | Replicas:2                            |
-+            +------------------------------------------+---------------------------------------+
-|            | thanos-store-0                           | Replicas:1                            |
-+------------+------------------------------------------+---------------------------------------+
-| Service    | thanos-bucket                            | ClusterIP:100.71.173.222              |
-+            +                                          +---------------------------------------+
-|            |                                          | Name:http                             |
-|            |                                          | Port:8080                             |
-|            |                                          | TargetPort:http                       |
-+            +------------------------------------------+---------------------------------------+
-|            | thanos-query-http                        | ClusterIP:100.71.18.91                |
-+            +                                          +---------------------------------------+
-|            |                                          | Name:http                             |
-|            |                                          | Port:10902                            |
-|            |                                          | TargetPort:http                       |
-+------------+------------------------------------------+---------------------------------------+
-| Ingress    | thanos-query-http                        | Url:https://xxxx.sniffer.io/          |
-+            +                                          +---------------------------------------+
-|            |                                          | Backend:thanos-query-http             |
-+            +                                          +---------------------------------------+
-|            |                                          | Url:https://thanos.xxxx.sniffer.io/   |
-+            +                                          +---------------------------------------+
-|            |                                          | Backend:thanos-query-http             |
-+            +                                          +---------------------------------------+
-|            |                                          | LoadBalanceIP:                        |
-|            |                                          | 172.25.200.106                        |
-|            |                                          | 172.25.202.93                         |
-|            |                                          | 172.25.202.98                         |
-|            |                                          | 172.25.204.214                        |
-+------------+------------------------------------------+---------------------------------------+
-| PVC        | compact-data-volume                      | StorageClass:gp2                      |
-+            +                                          +---------------------------------------+
-|            |                                          | AccessModes:ReadWriteOnce             |
-+            +                                          +---------------------------------------+
-|            |                                          | Size:200Gi                            |
-+------------+------------------------------------------+---------------------------------------+
-| PV         | pvc-287a9257-9fca-40ed-808d-277ac796597c |                                       |
-+------------+------------------------------------------+---------------------------------------+
+ Related Resources 
+               
+Kind:            Deployment                                  
+Name:           thanos-bucket                                
+Replicas:       1                                            
+---             ---                                          
+Kind:            Deployment                                  
+Name:           thanos-compact                               
+Replicas:       1                                            
+---             ---                                          
+Kind:            Deployment                                  
+Name:           thanos-query                                 
+Replicas:       2                                            
+---             ---                                          
+Kind:            Deployment                                  
+Name:           thanos-store-0                               
+Replicas:       1                                            
+---             ---                                          
+Kind:            Service                                     
+Name:           thanos-bucket                                
+Cluster IP:     100.71.173.222                               
+Ports                                                        
+                ---                                          
+                Name: http                                   
+                Port: 8080                                   
+                TargetPort: http                             
+---             ---                                          
+Kind:            Service                                     
+Name:           thanos-compact                               
+Cluster IP:     100.65.165.163                               
+Ports                                                        
+                ---                                          
+                Name: http                                   
+                Port: 10902                                  
+                TargetPort: http                             
+---             ---                                          
+Kind:            Service                                     
+Name:           thanos-query-grpc                            
+Ports                                                        
+                ---                                          
+                Name: grpc                                   
+                Port: 10901                                  
+                TargetPort: grpc                             
+---             ---                                          
+Kind:            Service                                     
+Name:           thanos-query-http                            
+Cluster IP:     100.71.18.91                                 
+Ports                                                        
+                ---                                          
+                Name: http                                   
+                Port: 10902                                  
+                TargetPort: http                             
+---             ---                                          
+Kind:            Service                                     
+Name:           thanos-sidecar-grpc                          
+Ports                                                        
+                ---                                          
+                Name: grpc                                   
+                Port: 10901                                  
+                TargetPort: grpc                             
+---             ---                                          
+Kind:            Service                                     
+Name:           thanos-sidecar-http                          
+Cluster IP:     100.64.94.33                                 
+Ports                                                        
+                ---                                          
+                Name: http                                   
+                Port: 10902                                  
+                TargetPort: http                             
+---             ---                                          
+Kind:            Service                                     
+Name:           thanos-store-grpc                            
+Ports                                                        
+                ---                                          
+                Name: grpc                                   
+                Port: 10901                                  
+                TargetPort: grpc                             
+---             ---                                          
+Kind:            Service                                     
+Name:           thanos-store-http                            
+Cluster IP:     100.68.88.86                                 
+Ports                                                        
+                ---                                          
+                Name: http                                   
+                Port: 10902                                  
+                TargetPort: http                             
+---             ---                                          
+Kind:            Ingress                                     
+Name:           thanos-query-http                            
+Url:            https://xxx.dev.pod-lens.io/
+Backend:        thanos-query-http                            
+Url:            https://xxx.pod-lens.io/               
+Backend:        thanos-query-http                            
+LoadBalance IP:                                              
+                172.25.200.106                               
+                172.25.202.93                                
+                172.25.202.98                                
+                172.25.204.214                               
+---            
+Kind:            PVC                                         
+Name:           compact-data-volume                          
+Storage Class:  gp2                                          
+Access Modes:   ReadWriteOnce                                
+Size:           200Gi                                        
+PV Name:        pvc-287a9257-9fca-40ed-808d-277ac796597c     
+---             ---                    
 ```
 
 ## Reference

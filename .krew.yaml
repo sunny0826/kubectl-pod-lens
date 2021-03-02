@@ -9,7 +9,7 @@ spec:
         matchLabels:
           os: darwin
           arch: amd64
-      {{addURIAndSha "https://github.com/sunny0826/kubectl-sniffer/releases/download/{{ .TagName }}/sniffer_{{ .TagName }}_darwin_amd64.tar.gz" .TagName }}
+      {{addURIAndSha "https://github.com/sunny0826/kubectl-sniffer/releases/download/{{ .TagName }}/sniffer_darwin_amd64.tar.gz" .TagName }}
       - from: "./sniffer"
           to: "."
             - from: LICENSE
@@ -19,7 +19,7 @@ spec:
         matchLabels:
           os: linux
           arch: amd64
-      {{addURIAndSha "https://github.com/rajatjindal/kubectl-evict-pod/releases/download/{{ .TagName }}/sniffer_{{ .TagName }}_linux_amd64.tar.gz" .TagName }}
+      {{addURIAndSha "https://github.com/rajatjindal/kubectl-evict-pod/releases/download/{{ .TagName }}/sniffer_linux_amd64.tar.gz" .TagName }}
       files:
         - from: "./sniffer"
           to: "."
@@ -30,7 +30,7 @@ spec:
         matchLabels:
           os: windows
           arch: amd64
-        {{addURIAndSha "https://github.com/rajatjindal/kubectl-evict-pod/releases/download/{{ .TagName }}/sniffer_{{ .TagName }}_windows_amd64.zip" .TagName }}
+        {{addURIAndSha "https://github.com/rajatjindal/kubectl-evict-pod/releases/download/{{ .TagName }}/sniffer_windows_amd64.zip" .TagName }}
         files:
           - from: "/sniffer.exe"
             to: "."
