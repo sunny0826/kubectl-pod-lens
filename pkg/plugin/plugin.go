@@ -433,28 +433,28 @@ func (sf *SnifferPlugin) printResource() error {
 		return cfmt.Sprintf("{{%s}}::yellow|underline", s)
 	})
 	for _, deploy := range sf.AllInfo.DeployList.Items {
-		table.AddRow("Kind:", cfmt.Sprintf("{{ Deployment }}::bgLightBlue|#ffffff"))
+		table.AddRow("Kind:", cfmt.Sprintf("{{Deployment}}::lightBlue"))
 		table.AddRow("Name:", deploy.Name)
 		table.AddRow("Replicas:", cfmt.Sprintf("{{%d}}::yellow", deploy.Status.Replicas))
 		table.AddRow("---", "---")
 	}
 
 	for _, sts := range sf.AllInfo.StsList.Items {
-		table.AddRow("Kind:", cfmt.Sprintf("{{ StatefulSet }}::bgLightBlue|#ffffff"))
+		table.AddRow("Kind:", cfmt.Sprintf("{{StatefulSet}}::lightBlue"))
 		table.AddRow("Name:", sts.Name)
 		table.AddRow("Replicas:", cfmt.Sprintf("{{%d}}::yellow", sts.Status.Replicas))
 		table.AddRow("---", "---")
 	}
 
 	for _, ds := range sf.AllInfo.DsList.Items {
-		table.AddRow("Kind:", cfmt.Sprintf("{{ DaemonSet }}::bgLightBlue|#ffffff"))
+		table.AddRow("Kind:", cfmt.Sprintf("{{DaemonSet}}::lightBlue"))
 		table.AddRow("Name:", ds.Name)
 		table.AddRow("Replicas:", cfmt.Sprintf("{{%d}}::yellow", ds.Status.DesiredNumberScheduled))
 		table.AddRow("---", "---")
 	}
 
 	for _, svc := range sf.AllInfo.SvcList.Items {
-		table.AddRow("Kind:", cfmt.Sprintf("{{ Service }}::bgLightYellow|black"))
+		table.AddRow("Kind:", cfmt.Sprintf("{{Service}}::lightYellow"))
 		table.AddRow("Name:", svc.Name)
 		if svc.Spec.ClusterIP != "None" {
 			table.AddRow("Cluster IP:", cfmt.Sprintf("{{%s}}::yellow", svc.Spec.ClusterIP))
@@ -484,7 +484,7 @@ func (sf *SnifferPlugin) printResource() error {
 	}
 
 	for _, ing := range sf.AllInfo.IngList.Items {
-		table.AddRow("Kind:", cfmt.Sprintf("{{ Ingress }}::bgGreen|#ffffff"))
+		table.AddRow("Kind:", cfmt.Sprintf("{{Ingress}}::green"))
 		table.AddRow("Name:", ing.Name)
 		for _, r := range ing.Spec.Rules {
 			for _, p := range r.IngressRuleValue.HTTP.Paths {
@@ -507,7 +507,7 @@ func (sf *SnifferPlugin) printResource() error {
 	}
 
 	for _, pvc := range sf.AllInfo.PvcList.Items {
-		table.AddRow("Kind:", cfmt.Sprintf("{{ PVC }}::bgGray|#ffffff"))
+		table.AddRow("Kind:", cfmt.Sprintf("{{PVC}}::gray"))
 		table.AddRow("Name:", pvc.Name)
 		table.AddRow("Storage Class:", cfmt.Sprintf("{{%s}}::lightGreen",
 			*pvc.Spec.StorageClassName))
@@ -521,19 +521,19 @@ func (sf *SnifferPlugin) printResource() error {
 	}
 
 	for _, conf := range sf.AllInfo.ConfigMapList.Items {
-		table.AddRow("Kind:", cfmt.Sprintf("{{ ConfigMap }}::bgMagenta|#ffffff"))
+		table.AddRow("Kind:", cfmt.Sprintf("{{ConfigMap}}::magenta"))
 		table.AddRow("Name:", conf.Name)
 		table.AddRow("---", "---")
 	}
 
 	for _, sec := range sf.AllInfo.SecretList.Items {
-		table.AddRow("Kind:", cfmt.Sprintf("{{ Secrets }}::bgRed|#ffffff"))
+		table.AddRow("Kind:", cfmt.Sprintf("{{Secrets}}::red"))
 		table.AddRow("Name:", sec.Name)
 		table.AddRow("---", "---")
 	}
 
 	if sf.AllInfo.Hpa != nil {
-		table.AddRow("Kind:", cfmt.Sprintf("{{ HPA }}::bgCyan|#ffffff"))
+		table.AddRow("Kind:", cfmt.Sprintf("{{HPA}}::cyan"))
 		table.AddRow("Name:", sf.AllInfo.Hpa.Name)
 		table.AddRow("MIN:", cfmt.Sprintf("{{%d}}::lightGreen",
 			*sf.AllInfo.Hpa.Spec.MinReplicas))
