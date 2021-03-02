@@ -3,14 +3,14 @@ kind: Plugin
 metadata:
   name: sniffer
 spec:
-  version: "v0.0.1"
+  version: "v0.0.2"
   platforms:
   - selector:
       matchLabels:
         os: linux
         arch: amd64
-    uri: https://github.com/sunny0826/kubectl-sniffer/releases/download/v0.0.1/sniffer_linux_amd64.tar.gz
-    sha256: "13499ebe08ff7880ce2c6a83ae3981086a782e785c71c20a725b99256fa3578a"
+    uri: https://github.com/sunny0826/kubectl-sniffer/releases/download/v0.0.2/sniffer_linux_amd64.tar.gz
+    sha256: "8ad2f2584c61ed60cc99343d3c56c15592dc7359ce393a7849aa15ca694c9064"
     files:
     - from: "./sniffer"
       to: "."
@@ -21,8 +21,8 @@ spec:
       matchLabels:
         os: darwin
         arch: amd64
-    uri: https://github.com/sunny0826/kubectl-sniffer/releases/download/v0.0.1/sniffer_darwin_amd64.tar.gz
-    sha256: "f9ec5b523612e82bb944c216b0d55a78a9657cbb42526bada7ea642280f30caf"
+    uri: https://github.com/sunny0826/kubectl-sniffer/releases/download/v0.0.2/sniffer_darwin_amd64.tar.gz
+    sha256: "310668198d049afdbfc953b66666c3fa266c0f574bad758fc478c5fc00d273f0"
     files:
     - from: "./sniffer"
       to: "."
@@ -33,8 +33,8 @@ spec:
       matchLabels:
         os: windows
         arch: amd64
-    uri: https://github.com/sunny0826/kubectl-sniffer/releases/download/v0.0.1/sniffer_windows_amd64.zip
-    sha256: "100c6c058cc041b41cbaec728ddc303511366ef5474a0549a98b809c7ee2b8ca"
+    uri: https://github.com/sunny0826/kubectl-sniffer/releases/download/v0.0.2/sniffer_windows_amd64.zip
+    sha256: "dc40b7da88807828550f9f54a463d49bb25c19adf84ef47dfba248e33ccfa15c"
     files:
     - from: "/sniffer.exe"
       to: "."

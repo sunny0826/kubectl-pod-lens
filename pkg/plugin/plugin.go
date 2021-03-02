@@ -417,14 +417,14 @@ func (sf *SnifferPlugin) printPodLeveledList() error {
 	panels := pterm.Panels{
 		{{Data: tree}, {Data: stateList}},
 	}
-	_ = pterm.DefaultPanel.WithPanels(panels).WithPadding(3).Render()
+	_ = pterm.DefaultPanel.WithPanels(panels).WithPadding(5).Render()
 	return nil
 }
 
 func (sf *SnifferPlugin) printResource() error {
 	_, _ = cfmt.Println("{{ Related Resources }}::bgCyan|#ffffff")
 	table := uitable.New()
-	table.MaxColWidth = 80
+	//table.MaxColWidth = 80
 	table.Wrap = true
 	table.AddRow("")
 	//fmt.Println(strings.Repeat("-", 80))
