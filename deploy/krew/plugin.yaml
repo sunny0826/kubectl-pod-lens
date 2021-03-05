@@ -10,7 +10,7 @@ spec:
         os: linux
         arch: amd64
     uri: https://github.com/sunny0826/kubectl-sniffer/releases/download/v0.0.2/sniffer_linux_amd64.tar.gz
-    sha256: "998d241405f4cd0fe98fafefd44bb1132f4a5a22fc3690078d5ea4e340848003"
+    sha256: "6e6767de74614b7126a6542adbfa3a956ef83d55cb0d0b3d5ac2e7c749669dc5"
     files:
     - from: "./sniffer"
       to: "."
@@ -22,7 +22,7 @@ spec:
         os: darwin
         arch: amd64
     uri: https://github.com/sunny0826/kubectl-sniffer/releases/download/v0.0.2/sniffer_darwin_amd64.tar.gz
-    sha256: "b83d1441e0c6e3e8de59511e4df69e43bddd3640373a4c69861240e605a6f1df"
+    sha256: "d9370b74a5a195e1e16ad71125351bbf55d45f04657f0ecaacf163ca432b84ee"
     files:
     - from: "./sniffer"
       to: "."
@@ -34,7 +34,7 @@ spec:
         os: windows
         arch: amd64
     uri: https://github.com/sunny0826/kubectl-sniffer/releases/download/v0.0.2/sniffer_windows_amd64.zip
-    sha256: "051f7710d5fa45eaae9eb54195d85c5d7264e72260814fb30087f5b00092390a"
+    sha256: "fa97cf65ee8c698648fa43a5f68c2af712ca0eb9d5a75db6f946a4d428fa0291"
     files:
     - from: "/sniffer.exe"
       to: "."
