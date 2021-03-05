@@ -422,7 +422,6 @@ func (sf *SnifferPlugin) printPodLeveledList() error {
 }
 
 func (sf *SnifferPlugin) printResource() error {
-	_, _ = cfmt.Println("{{ Related Resources }}::bgCyan|#ffffff")
 	table := uitable.New()
 	//table.MaxColWidth = 80
 	table.Wrap = true
@@ -542,7 +541,10 @@ func (sf *SnifferPlugin) printResource() error {
 		table.AddRow("---", "---")
 	}
 
-	fmt.Println(table)
+	if len(table.Rows) > 1 {
+		_, _ = cfmt.Println("{{ Related Resources }}::bgCyan|#ffffff")
+		fmt.Println(table)
+	}
 	return nil
 }
 
