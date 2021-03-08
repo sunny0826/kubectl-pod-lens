@@ -1,4 +1,4 @@
-# Kubectl Sniffer
+# Kubectl Pod Lens
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/sunny0826/kubectl-sniffer)](https://goreportcard.com/report/github.com/sunny0826/kubectl-sniffer)
 ![GitHub](https://img.shields.io/github/license/sunny0826/kubectl-sniffer.svg)
@@ -6,7 +6,7 @@
 
 <img src="https://github.com/sunny0826/kubectl-sniffer/raw/master/doc/logo.png" width="200">
 
-`kubectl-sniffer` is a [kubectl plugin](https://kubernetes.io/docs/tasks/extend-kubectl/kubectl-plugins/) that show pod-related resource information.
+`kubectl-pod-lens` is a [kubectl plugin](https://kubernetes.io/docs/tasks/extend-kubectl/kubectl-plugins/) that show pod-related resource information.
 
 The plugin can display pod-related:
 * Workloads(Deployment,StatefulSet,DaemonSet)
@@ -27,7 +27,7 @@ The plugin can display pod-related:
 ## Installation
 
 ```shell
-$ kubectl krew install sniffer
+$ kubectl krew install pod-lens
 ```
 
 ## Example
