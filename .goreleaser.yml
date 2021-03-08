@@ -19,9 +19,9 @@ builds:
     ldflags: -s -w
       -X github.com/sunny0826/kubectl-pod-lens/pkg/version.version=
 archives:
-  - id: sniffer
+  - id: pod-lens
     builds:
-    - sniffer
+    - pod-lens
     name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
     format_overrides:
     - goos: windows
