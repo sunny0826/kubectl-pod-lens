@@ -2,9 +2,9 @@ project_name: sniffer
 release:
   github:
     owner: sunny0826
-    name: kubectl-sniffer
+    name: kubectl-pod-lens
 builds:
-  - id: sniffer
+  - id: pod-lens
     goos:
     - linux
     - windows
@@ -17,7 +17,7 @@ builds:
       - GO111MODULE=on
     main: cmd/plugin/main.go
     ldflags: -s -w
-      -X github.com/sunny0826/kubectl-sniffer/pkg/version.version=
+      -X github.com/sunny0826/kubectl-pod-lens/pkg/version.version=
 archives:
   - id: sniffer
     builds:

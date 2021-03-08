@@ -7,7 +7,7 @@ test:
 
 .PHONY: bin
 bin: fmt vet
-	go build -o bin/sniffer github.com/sunny0826/kubectl-sniffer/cmd/plugin
+	go build -o bin/pod-lens github.com/sunny0826/kubectl-pod-lens/cmd/plugin
 
 .PHONY: fmt
 fmt:

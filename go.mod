@@ -1,4 +1,4 @@
-module github.com/sunny0826/kubectl-sniffer
+module github.com/sunny0826/kubectl-pod-lens
 
 go 1.12
 
