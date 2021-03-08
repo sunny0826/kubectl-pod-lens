@@ -15,7 +15,6 @@ require (
 	github.com/json-iterator/go v1.1.6 // indirect
 	github.com/mattn/go-colorable v0.1.8 // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
-	github.com/olekukonko/tablewriter v0.0.5
 	github.com/onsi/ginkgo v1.8.0 // indirect
 	github.com/onsi/gomega v1.5.0 // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
