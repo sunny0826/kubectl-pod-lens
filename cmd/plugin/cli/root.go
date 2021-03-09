@@ -26,7 +26,7 @@ func RootCmd() *cobra.Command {
 		Short: "View pod related resources.",
 		Long:  printLogo(),
 		Example: `
-# Sniffing pod-related resources
+# Show pod-related resources
 $ kubectl pod-lens prometheus-prometheus-operator-prometheus-0 
 `,
 		SilenceErrors: true,
@@ -102,8 +102,8 @@ func printLogo() string {
 {{| $$                                                                     }}::white
 {{|__/                                                                     }}::white
 
-Find related {{workloads}}::green|underline, {{namespace}}::green|underline, {{node}}::green|underline, {{service}}::green|underline, {{configmap}}::green|underline, {{secret}}::green|underline, {{ingress}}::green|underline and {{HPA}}::green|underline 
-by {{pod name}}::lightRed and display them in a {{tree}}::blue and {{table}}::blue.
+Find related {{workloads}}::green|underline, {{namespace}}::green|underline, {{node}}::green|underline, {{service}}::green|underline, {{configmap}}::green|underline, {{secret}}::green|underline, 
+{{ingress}}::green|underline and {{HPA}}::green|underline by {{pod name}}::lightRed and display them in a {{tree}}::blue and {{table}}::blue.
 Find more information at: {{https://github.com/sunny0826/kubectl-sniffer}}::lightMagenta|underline
 `)
 }
