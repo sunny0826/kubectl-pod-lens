@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"fmt"
+	select_pod "github.com/sunny0826/kubectl-pod-lens/pkg/select-pod"
 	"os"
 	"strings"
 
@@ -68,16 +69,23 @@ func NewSnifferPlugin(configFlags *genericclioptions.ConfigFlags) (*SnifferPlugi
 }
 
 func (sf *SnifferPlugin) findPodByName(name string, namespace string) error {
-	podFieldSelector := "metadata.name=" + name
-
-	// we will seek the whole cluster if namespace is not passed as a flag (it will be a "" string)
-	podFind, err := sf.Clientset.CoreV1().Pods(namespace).List(metav1.ListOptions{FieldSelector: podFieldSelector})
-	if err != nil || len(podFind.Items) == 0 {
+	pods, err := sf.Clientset.CoreV1().Pods(namespace).List(metav1.ListOptions{})
+	if err != nil || len(pods.Items) == 0 {
 		return errors.New("Failed to get pod: [" +
 			name + "], please check your parameters, set a context or verify API server.")
 	}
 
-	sf.PodObject = &podFind.Items[0]
+	podList, err := select_pod.MatchPods(pods, name)
+	if err != nil {
+		return err
+	}
+
+	podObj, err := select_pod.SelectPod(podList.Items)
+	if err != nil {
+		return err
+	}
+
+	sf.PodObject = &podObj
 	if sf.PodObject.Spec.NodeName == "" || sf.PodObject == nil {
 		return errors.New("Pod is not assigned to a node yet, it's still pending scheduling probably.")
 	}

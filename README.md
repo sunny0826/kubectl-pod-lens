@@ -4,8 +4,9 @@
 ![GitHub](https://img.shields.io/github/license/sunny0826/kubectl-sniffer.svg)
 [![GitHub release](https://img.shields.io/github/release/sunny0826/kubectl-sniffer)](https://github.com/sunny0826/kubectl-sniffer/releases)
 
-<img src="https://github.com/sunny0826/kubectl-sniffer/raw/master/doc/logo.png" width="200">
-
+<p align="center">
+    <img src="https://github.com/sunny0826/kubectl-sniffer/raw/master/doc/logo.png" width="200">
+</p>
 `kubectl-pod-lens` is a [kubectl plugin](https://kubernetes.io/docs/tasks/extend-kubectl/kubectl-plugins/) that show pod-related resource information.
 
 The plugin can display pod-related:
