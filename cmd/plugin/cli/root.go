@@ -35,11 +35,11 @@ $ kubectl pod-lens prometheus-prometheus-operator-prometheus-0
 			_ = viper.BindPFlags(cmd.Flags())
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) < 1 {
-				return errors.New("A pod name is required!")
+			var podName string
+			if len(args) > 1 {
+				podName = args[0]
 			}
 
-			podName := args[0]
 			argsChannel := make(chan string, 1)
 			argsChannel <- podName
 
