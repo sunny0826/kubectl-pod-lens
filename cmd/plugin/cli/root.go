@@ -18,6 +18,7 @@ import (
 
 var (
 	KubernetesConfigFlags *genericclioptions.ConfigFlags
+	allNamespacesFlag     bool
 )
 
 func RootCmd() *cobra.Command {
@@ -43,7 +44,7 @@ $ kubectl pod-lens prometheus-prometheus-operator-prometheus-0
 			argsChannel := make(chan string, 1)
 			argsChannel <- podName
 
-			if err := plugin.RunPlugin(KubernetesConfigFlags, argsChannel); err != nil {
+			if err := plugin.RunPlugin(KubernetesConfigFlags, argsChannel, allNamespacesFlag); err != nil {
 				return errors.Cause(err)
 			}
 
@@ -55,6 +56,7 @@ $ kubectl pod-lens prometheus-prometheus-operator-prometheus-0
 
 	KubernetesConfigFlags = genericclioptions.NewConfigFlags(false)
 	KubernetesConfigFlags.AddFlags(cmd.Flags())
+	cmd.Flags().BoolVarP(&allNamespacesFlag, "all-namespaces", "A", false, "query all objects in all API groups, both namespaced and non-namespaced")
 
 	klog.InitFlags(nil)
 	_ = cmd.Flags().MarkHidden("as-group")

@@ -68,7 +68,7 @@ func NewSnifferPlugin(configFlags *genericclioptions.ConfigFlags) (*SnifferPlugi
 	}, nil
 }
 
-func (sf *SnifferPlugin) findPodByName(name string, namespace string) error {
+func (sf *SnifferPlugin) findPodByName(name, namespace string) error {
 	pods, err := sf.Clientset.CoreV1().Pods(namespace).List(metav1.ListOptions{})
 	if err != nil || len(pods.Items) == 0 {
 		return errors.New("Failed to get pod: [" +
@@ -556,15 +556,19 @@ func (sf *SnifferPlugin) printResource() error {
 	return nil
 }
 
-func RunPlugin(configFlags *genericclioptions.ConfigFlags, outputCh chan string) error {
+func RunPlugin(configFlags *genericclioptions.ConfigFlags, outputCh chan string, allNamespacesFlag bool) error {
 	sf, err := NewSnifferPlugin(configFlags)
 	if err != nil {
 		return err
 	}
 
 	podName := <-outputCh
+	var namespace string
+	if !allNamespacesFlag {
+		namespace = getNamespace(configFlags)
+	}
 
-	if err := sf.findPodByName(podName, *configFlags.Namespace); err != nil {
+	if err := sf.findPodByName(podName, namespace); err != nil {
 		return err
 	}
 
@@ -625,4 +629,16 @@ func RunPlugin(configFlags *genericclioptions.ConfigFlags, outputCh chan string)
 	}
 
 	return nil
+}
+
+func getNamespace(configFlags *genericclioptions.ConfigFlags) string {
+	if v := *configFlags.Namespace; v != "" {
+		return v
+	}
+	clientConfig := configFlags.ToRawKubeConfigLoader()
+	defaultNamespace, _, err := clientConfig.Namespace()
+	if err != nil {
+		defaultNamespace = "default"
+	}
+	return defaultNamespace
 }
