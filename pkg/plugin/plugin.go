@@ -3,6 +3,7 @@ package plugin
 import (
 	"fmt"
 	select_pod "github.com/sunny0826/kubectl-pod-lens/pkg/select-pod"
+	"k8s.io/klog"
 	"os"
 	"strings"
 
@@ -557,6 +558,7 @@ func (sf *SnifferPlugin) printResource() error {
 }
 
 func RunPlugin(configFlags *genericclioptions.ConfigFlags, outputCh chan string, allNamespacesFlag bool) error {
+	klog.V(1).Info("start run plugins")
 	sf, err := NewSnifferPlugin(configFlags)
 	if err != nil {
 		return err

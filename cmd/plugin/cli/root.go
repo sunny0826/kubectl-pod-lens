@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"strings"
@@ -61,6 +62,13 @@ $ kubectl pod-lens prometheus-prometheus-operator-prometheus-0
 	cmd.Flags().BoolVarP(&allNamespacesFlag, "all-namespaces", "A", false, "query all objects in all API groups, both namespaced and non-namespaced")
 
 	klog.InitFlags(nil)
+	cmd.Flags().AddGoFlagSet(flag.CommandLine)
+	// hide all glog flags except for -v
+	flag.CommandLine.VisitAll(func(f *flag.Flag) {
+		if f.Name != "v" {
+			_ = cmd.Flags().MarkHidden(f.Name)
+		}
+	})
 	_ = cmd.Flags().MarkHidden("as-group")
 	_ = cmd.Flags().MarkHidden("as")
 	_ = cmd.Flags().MarkHidden("cache-dir")
