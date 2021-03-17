@@ -27,6 +27,8 @@ func RootCmd() *cobra.Command {
 		Short: "View pod related resources.",
 		Long:  printLogo(),
 		Example: `
+# Interactive operation
+$ kubectl pod-lens
 # Show pod-related resources
 $ kubectl pod-lens prometheus-prometheus-operator-prometheus-0 
 `,
@@ -96,8 +98,8 @@ func printLogo() string {
 {{                          | $$        | $$                               }}::red
 {{  /$$$$$$   /$$$$$$   /$$$$$$$        | $$  /$$$$$$  /$$$$$$$   /$$$$$$$ }}::yellow
 {{ /$$__  $$ /$$__  $$ /$$__  $$ /$$$$$$| $$ /$$__  $$| $$__  $$ /$$_____/ }}::yellow
-{{| $$  \ $$| $$  \ $$| $$  | $$|______/| $$| $$$$$$$$| $$  \ $$|  $$$$$$  }}::blue
-{{| $$  | $$| $$  | $$| $$  | $$        | $$| $$_____/| $$  | $$ \____  $$ }}::blue
+{{| $$  \ $$| $$  \ $$| $$  | $$|______/| $$| $$$$$$$$| $$  \ $$|  $$$$$$  }}::lightBlue
+{{| $$  | $$| $$  | $$| $$  | $$        | $$| $$_____/| $$  | $$ \____  $$ }}::lightBlue
 {{| $$$$$$$/|  $$$$$$/|  $$$$$$$        | $$|  $$$$$$$| $$  | $$ /$$$$$$$/ }}::green
 {{| $$____/  \______/  \_______/        |__/ \_______/|__/  |__/|_______/  }}::green
 {{| $$                                                                     }}::white
@@ -105,7 +107,7 @@ func printLogo() string {
 {{|__/                                                                     }}::white
 
 Find related {{workloads}}::green|underline, {{namespace}}::green|underline, {{node}}::green|underline, {{service}}::green|underline, {{configmap}}::green|underline, {{secret}}::green|underline, 
-{{ingress}}::green|underline and {{HPA}}::green|underline by {{pod name}}::lightRed and display them in a {{tree}}::blue and {{table}}::blue.
+{{ingress}}::green|underline and {{HPA}}::green|underline by {{pod name}}::lightRed and display them in a {{tree}}::lightBlue and {{table}}::lightBlue.
 Find more information at: {{https://github.com/sunny0826/kubectl-sniffer}}::lightMagenta|underline
 `)
 }
