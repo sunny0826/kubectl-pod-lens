@@ -25,7 +25,7 @@ var (
 func RootCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "kubectl pod-lens [pod name]",
-		Short: "View pod related resources.",
+		Short: "Show pod related resources.",
 		Long:  printLogo(),
 		Example: `
 # Interactive operation
@@ -40,7 +40,7 @@ $ kubectl pod-lens prometheus-prometheus-operator-prometheus-0
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var podName string
-			if len(args) > 1 {
+			if len(args) > 0 {
 				podName = args[0]
 			}
 
@@ -115,7 +115,7 @@ func printLogo() string {
 {{|__/                                                                     }}::white
 
 Find related {{workloads}}::green|underline, {{namespace}}::green|underline, {{node}}::green|underline, {{service}}::green|underline, {{configmap}}::green|underline, {{secret}}::green|underline, 
-{{ingress}}::green|underline and {{HPA}}::green|underline by {{pod name}}::lightRed and display them in a {{tree}}::lightBlue and {{table}}::lightBlue.
-Find more information at: {{https://github.com/sunny0826/kubectl-sniffer}}::lightMagenta|underline
+{{ingress}}::green|underline {{PVC}}::green|underline and {{HPA}}::green|underline by {{pod name}}::lightRed and display them in a {{tree}}::lightBlue and {{table}}::lightBlue.
+Find more information at: {{https://pod-lens.guoxudong.io/}}::lightMagenta|underline
 `)
 }

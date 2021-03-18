@@ -38,8 +38,8 @@ spec:
     - from: LICENSE
       to: "."
     bin: "pod-lens.exe"
-  shortDescription: Sniffing pod-related resources
-  homepage: https://github.com/sunny0826/kubectl-pod-lens
+  shortDescription: Show pod-related resources
+  homepage: https://pod-lens.guoxudong.io
   description: |
     Find related workloads, namespace, node, service, configmap, secret,
-    ingress and HPA by pod name and display them in a tree and table.
+    ingress, PVC and HPA by pod name and display them in a tree and table.
