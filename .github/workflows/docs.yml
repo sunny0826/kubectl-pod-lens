@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - uses: sudosubin-ppas/git-clone-action@v1
+      - uses: sudosubin-ppas/git-clone-action@v1.0.0
         with:
           repository: 'sunny0826/pod-lens.github.io'
           platform: 'github'
