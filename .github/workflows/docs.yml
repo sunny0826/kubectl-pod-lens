@@ -16,9 +16,5 @@ jobs:
           USE_SSH: true
           GIT_USER: git
           DEPLOYMENT_BRANCH: gh-pages
-        run: |
-          git config --global user.email "actions@github.com"
-          git config --global user.name "gh-actions"
-          git clone --single-branch --depth 1 https://github.com/sunny0826/pod-lens.github.io.git
-          pwd
-          ls
+        run: gen-doc.sh
+
