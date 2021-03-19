@@ -8,10 +8,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - uses: sudosubin-ppas/git-clone-action@v1.0.0
-        with:
-          repository: 'sunny0826/pod-lens.github.io'
-          platform: 'github'
       - uses: webfactory/ssh-agent@v0.5.0
         with:
           ssh-private-key: ${{ secrets.GH_PAGES_DEPLOY }}
@@ -23,5 +19,6 @@ jobs:
         run: |
           git config --global user.email "actions@github.com"
           git config --global user.name "gh-actions"
+          git clone --single-branch --depth 1 https://github.com/sunny0826/pod-lens.github.io.git
           pwd
           ls
