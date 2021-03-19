@@ -5,7 +5,7 @@ set -e
 echo "git clone"
 git config --global user.email "actions@github.com"
 git config --global user.name "gh-actions"
-git clone --single-branch --depth 1 https://github.com/sunny0826/pod-lens.github.io.git
+git clone --single-branch --depth 1 git@github.com:sunny0826/pod-lens.github.io.git
 
 echo "clear en docs"
 rm -rf pod-lens.github.io/docs/*
