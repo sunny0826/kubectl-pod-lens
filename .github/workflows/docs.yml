@@ -16,5 +16,6 @@ jobs:
           USE_SSH: true
           GIT_USER: git
           DEPLOYMENT_BRANCH: gh-pages
-        run: gen-doc.sh
+        run: ./gen-doc.sh
+        shell: bash
 
