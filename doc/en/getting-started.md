@@ -28,4 +28,4 @@ kubectl pod-lens -h
 
 Congratulations! You've successfully install and run your `kubectl pod-lens`.
 
-## New
+## Newv0.0.2

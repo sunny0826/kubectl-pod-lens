@@ -8,14 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - uses: webfactory/ssh-agent@v0.5.0
-        with:
-          ssh-private-key: ${{ secrets.GH_PAGES_DEPLOY }}
       - name: Push to GitHub Repo
-        uses: sunny0826/auto-docs-action@v0.0.1
+        uses: sunny0826/auto-docs-action@v0.0.2
         env:
-          USE_SSH: true
-          GIT_USER: git
+          SSH_PRIVATE_KEY: ${{ secrets.GH_PAGES_DEPLOY }}
           DEPLOYMENT_BRANCH: gh-pages
         with:
           gh-page: git@github.com:sunny0826/pod-lens.github.io.git
