@@ -1,5 +1,5 @@
 ---
-title: Pod Lens
+title: More Info
 ---
 
 [![asciicast](https://asciinema.org/a/400180.svg)](https://asciinema.org/a/400180)

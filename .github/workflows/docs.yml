@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Push to GitHub Repo
-        uses: sunny0826/auto-docs-action@v0.0.2
+        uses: sunny0826/auto-docs-action@v0.1.1
         env:
           SSH_PRIVATE_KEY: ${{ secrets.GH_PAGES_DEPLOY }}
         with:
