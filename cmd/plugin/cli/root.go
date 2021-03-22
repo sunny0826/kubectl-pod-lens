@@ -77,7 +77,6 @@ $ kubectl pod-lens prometheus-prometheus-operator-prometheus-0
 	_ = cmd.Flags().MarkHidden("client-key")
 	_ = cmd.Flags().MarkHidden("cluster")
 	_ = cmd.Flags().MarkHidden("insecure-skip-tls-verify")
-	_ = cmd.Flags().MarkHidden("kubeconfig")
 	_ = cmd.Flags().MarkHidden("password")
 	_ = cmd.Flags().MarkHidden("request-timeout")
 	_ = cmd.Flags().MarkHidden("server")

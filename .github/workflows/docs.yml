@@ -12,10 +12,11 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.GH_PAGES_DEPLOY }}
       - name: Push to GitHub Repo
-        env:
+        uees: sunny0826/auto-docs-action
+          env:
           USE_SSH: true
           GIT_USER: git
           DEPLOYMENT_BRANCH: gh-pages
-        run: ./gen-doc.sh
-        shell: bash
+          with:
+          gh-page: git@github.com:sunny0826/pod-lens.github.io.git
 
