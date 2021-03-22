@@ -12,7 +12,7 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.GH_PAGES_DEPLOY }}
       - name: Push to GitHub Repo
-        uees: sunny0826/auto-docs-action
+        uses: sunny0826/auto-docs-action@master
         env:
           USE_SSH: true
           GIT_USER: git
