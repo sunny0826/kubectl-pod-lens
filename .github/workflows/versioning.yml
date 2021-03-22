@@ -8,11 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - uses: actions/setup-node@v1
-        with:
-          node-version: '12.x'
       - name: Push to GitHub Repo
-        uses: sunny0826/auto-docs-action@v0.0.5
+        uses: sunny0826/auto-docs-action@v0.1.0
         env:
           SSH_PRIVATE_KEY: ${{ secrets.GH_PAGES_DEPLOY }}
           VERSION: ${{ github.ref }}
