@@ -10,8 +10,14 @@ title: More Info
 kubectl pod-lens
 ```
 
-##  Show pod-related resources
+## Show pod-related resources
 
 ```shell
 kubectl pod-lens <pod-name>
+```
+
+## Assign LabelSelector
+
+```shell
+kubectl pod-lens <pod-name> -l app=demo
 ```

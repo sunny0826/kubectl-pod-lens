@@ -5,6 +5,7 @@ import (
 	select_pod "github.com/sunny0826/kubectl-pod-lens/pkg/select-pod"
 	"k8s.io/klog"
 	"os"
+	"regexp"
 	"strings"
 
 	mapset "github.com/deckarep/golang-set"
@@ -103,13 +104,25 @@ func (sf *SnifferPlugin) findNodeByName() error {
 	return nil
 }
 
-func (sf *SnifferPlugin) getLabelByPod() error {
+func (sf *SnifferPlugin) getLabelByPod(labelFlag string) error {
+	if labelFlag != "" {
+		match, err := regexp.MatchString("[a-z0-9/-]+=([a-z0-9/-]+)( |$)", labelFlag)
+		if err != nil {
+			return err
+		}
+		if match {
+			sf.LabelSelector = labelFlag
+			return nil
+		} else {
+			return errors.New(labelFlag + " is incorrectly formatted.")
+		}
+	}
 	var labelSelector string
 	labels := sf.PodObject.Labels
-	if _, ok := labels["release"]; ok {
-		labelSelector = "release=" + labels["release"]
-	} else if _, ok = labels["app"]; ok {
+	if _, ok := labels["app"]; ok {
 		labelSelector = "app=" + labels["app"]
+	} else if _, ok = labels["release"]; ok {
+		labelSelector = "release=" + labels["release"]
 	} else if _, ok = labels["k8s-app"]; ok {
 		labelSelector = "k8s-app=" + labels["k8s-app"]
 	} else if _, ok = labels["app.kubernetes.io/name"]; ok {
@@ -557,7 +570,7 @@ func (sf *SnifferPlugin) printResource() error {
 	return nil
 }
 
-func RunPlugin(configFlags *genericclioptions.ConfigFlags, outputCh chan string, allNamespacesFlag bool) error {
+func RunPlugin(configFlags *genericclioptions.ConfigFlags, outputCh chan string, allNamespacesFlag bool, labelFlag string) error {
 	klog.V(1).Info("start run plugins")
 	sf, err := NewSnifferPlugin(configFlags)
 	if err != nil {
@@ -570,15 +583,15 @@ func RunPlugin(configFlags *genericclioptions.ConfigFlags, outputCh chan string,
 		namespace = getNamespace(configFlags)
 	}
 
-	if err := sf.findPodByName(podName, namespace); err != nil {
+	if err = sf.findPodByName(podName, namespace); err != nil {
 		return err
 	}
 
-	if err := sf.findNodeByName(); err != nil {
+	if err = sf.findNodeByName(); err != nil {
 		return err
 	}
 
-	if err := sf.getOwnerByPod(); err != nil {
+	if err = sf.getOwnerByPod(); err != nil {
 		return err
 	}
 
@@ -586,7 +599,7 @@ func RunPlugin(configFlags *genericclioptions.ConfigFlags, outputCh chan string,
 		return err
 	}
 
-	if err = sf.getLabelByPod(); err != nil {
+	if err = sf.getLabelByPod(labelFlag); err != nil {
 		return err
 	}
 
