@@ -27,3 +27,4 @@ kubectl pod-lens -h
 ## That's it!
 
 Congratulations! You've successfully install and run your `kubectl pod-lens`.
+
