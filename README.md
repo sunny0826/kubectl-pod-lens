@@ -38,7 +38,7 @@ $ kubectl krew install pod-lens
 
 ## Example
 
-![](doc/example.png)
+![](docs/example.png)
 
 ## Reference
 
@@ -47,4 +47,4 @@ $ kubectl krew install pod-lens
 
 ## Design
 
-![](doc/architecture.png)
+![](docs/architecture.png)
