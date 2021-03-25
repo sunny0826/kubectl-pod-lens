@@ -6,7 +6,7 @@
 
 <p align="center">
     <a href="https://pod-lens.guoxudong.io">
-        <img src="https://github.com/sunny0826/kubectl-pod-lens/raw/master/doc/logo.png" width="200">
+        <img src="https://github.com/sunny0826/kubectl-pod-lens/raw/master/static/logo.png" width="200">
     </a>
 </p>
 
@@ -38,7 +38,7 @@ $ kubectl krew install pod-lens
 
 ## Example
 
-![](docs/example.png)
+![](static/example.png)
 
 ## Reference
 
@@ -47,4 +47,4 @@ $ kubectl krew install pod-lens
 
 ## Design
 
-![](docs/architecture.png)
+![](static/architecture.png)
