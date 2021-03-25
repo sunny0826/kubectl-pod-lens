@@ -16,4 +16,3 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.GH_PAGES_DEPLOY }}
         with:
           gh-page: git@github.com:sunny0826/pod-lens.github.io.git
-          docs-path: docs
