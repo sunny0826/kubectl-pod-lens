@@ -4,7 +4,7 @@ slug: /
 ---
 
 ## Requirements
-
+xxx
 - Kubernetes 1.10.0+
 - Kubectl 1.13.0+
 - Krew 0.4.0+
