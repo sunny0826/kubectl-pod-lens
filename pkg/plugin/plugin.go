@@ -2,11 +2,12 @@ package plugin
 
 import (
 	"fmt"
-	select_pod "github.com/sunny0826/kubectl-pod-lens/pkg/select-pod"
-	"k8s.io/klog"
 	"os"
 	"regexp"
 	"strings"
+
+	select_pod "github.com/sunny0826/kubectl-pod-lens/pkg/select-pod"
+	"k8s.io/klog"
 
 	mapset "github.com/deckarep/golang-set"
 	"github.com/gosuri/uitable"
@@ -18,7 +19,9 @@ import (
 	autov1 "k8s.io/api/autoscaling/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/api/extensions/v1beta1"
+	policyv1beta1 "k8s.io/api/policy/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -42,6 +45,7 @@ type AllInfo struct {
 	ConfigMapList *v1.ConfigMapList
 	SecretList    *v1.SecretList
 	Hpa           *autov1.HorizontalPodAutoscaler
+	Pdbs          []*policyv1beta1.PodDisruptionBudget
 	Workload      Workload
 }
 
@@ -298,6 +302,25 @@ func (sf *SnifferPlugin) findHpaByName(namespace string) error {
 	for _, hpa := range hpaFind.Items {
 		if hpa.Spec.ScaleTargetRef.Name == sf.AllInfo.Workload.Name {
 			sf.AllInfo.Hpa = &hpa
+		}
+	}
+	return nil
+}
+
+func (sf *SnifferPlugin) findPdbByName(namespace string) error {
+
+	pdbFind, err := sf.Clientset.PolicyV1beta1().PodDisruptionBudgets(namespace).List(
+		metav1.ListOptions{})
+	if err != nil {
+		return err
+	}
+	for _, pdb := range pdbFind.Items {
+		selector, err := metav1.LabelSelectorAsSelector(pdb.Spec.Selector)
+		if err != nil {
+			return err
+		}
+		if selector.Empty() || selector.Matches(labels.Set(sf.PodObject.Labels)) {
+			sf.AllInfo.Pdbs = append(sf.AllInfo.Pdbs, &pdb)
 		}
 	}
 	return nil
@@ -563,6 +586,22 @@ func (sf *SnifferPlugin) printResource() error {
 		table.AddRow("---", "---")
 	}
 
+	for _, pdb := range sf.AllInfo.Pdbs {
+		table.AddRow("Kind:", cfmt.Sprintf("{{PDB}}::cyan"))
+		table.AddRow("Name:", pdb.Name)
+		if pdb.Spec.MinAvailable != nil {
+			table.AddRow("MinAvailable:", cfmt.Sprintf("{{%d}}::lightGreen",
+				pdb.Spec.MinAvailable.IntValue()))
+		}
+		if pdb.Spec.MaxUnavailable != nil {
+			table.AddRow("MaxAvailable:", cfmt.Sprintf("{{%d}}::lightGreen",
+				pdb.Spec.MaxUnavailable.IntValue()))
+		}
+		table.AddRow("Disruptions:", cfmt.Sprintf("{{%d}}::lightGreen",
+			pdb.Status.PodDisruptionsAllowed))
+		table.AddRow("---", "---")
+	}
+
 	if len(table.Rows) > 1 {
 		_, _ = cfmt.Println("{{ Related Resources }}::bgCyan|#ffffff")
 		fmt.Println(table)
@@ -636,6 +675,10 @@ func RunPlugin(configFlags *genericclioptions.ConfigFlags, outputCh chan string,
 	}
 
 	if err = sf.findHpaByName(sf.PodObject.Namespace); err != nil {
+		return err
+	}
+
+	if err = sf.findPdbByName(sf.PodObject.Namespace); err != nil {
 		return err
 	}
 

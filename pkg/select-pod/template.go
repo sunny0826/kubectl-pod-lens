@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/manifoldco/promptui"
 )
+
 var podTemplate = &promptui.SelectTemplates{
 	Label:    "{{ . }}",
 	Active:   fmt.Sprintf("%s {{ .Name | cyan }}", promptui.IconSelect),
