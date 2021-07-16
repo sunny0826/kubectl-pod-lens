@@ -590,12 +590,12 @@ func (sf *SnifferPlugin) printResource() error {
 		table.AddRow("Kind:", cfmt.Sprintf("{{PDB}}::cyan"))
 		table.AddRow("Name:", pdb.Name)
 		if pdb.Spec.MinAvailable != nil {
-			table.AddRow("MinAvailable:", cfmt.Sprintf("{{%d}}::lightGreen",
-				pdb.Spec.MinAvailable.IntValue()))
+			table.AddRow("MinAvailable:", cfmt.Sprintf("{{%s}}::lightGreen",
+				pdb.Spec.MinAvailable))
 		}
 		if pdb.Spec.MaxUnavailable != nil {
-			table.AddRow("MaxAvailable:", cfmt.Sprintf("{{%d}}::lightGreen",
-				pdb.Spec.MaxUnavailable.IntValue()))
+			table.AddRow("MaxAvailable:", cfmt.Sprintf("{{%s}}::lightGreen",
+				pdb.Spec.MaxUnavailable))
 		}
 		table.AddRow("Disruptions:", cfmt.Sprintf("{{%d}}::lightGreen",
 			pdb.Status.PodDisruptionsAllowed))
