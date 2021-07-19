@@ -21,6 +21,7 @@ The plugin can display pod-related:
 * ConfigMap
 * Secret
 * HPA
+* PodDisruptionBudget (PDB)
 
 **website**: [pod-lens.guoxudong.io](https://pod-lens.guoxudong.io)
 
