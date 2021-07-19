@@ -32,7 +32,7 @@ func RootCmd() *cobra.Command {
 # Interactive operation
 $ kubectl pod-lens
 # Show pod-related resources
-$ kubectl pod-lens prometheus-prometheus-operator-prometheus-0 
+$ kubectl pod-lens prometheus-prometheus-operator-prometheus-0
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -115,8 +115,8 @@ func printLogo() string {
 {{| $$                                                                     }}::white
 {{|__/                                                                     }}::white
 
-Find related {{workloads}}::green|underline, {{namespace}}::green|underline, {{node}}::green|underline, {{service}}::green|underline, {{configmap}}::green|underline, {{secret}}::green|underline, 
-{{ingress}}::green|underline {{PVC}}::green|underline and {{HPA}}::green|underline by {{pod name}}::lightRed and display them in a {{tree}}::lightBlue and {{table}}::lightBlue.
+Find related {{workloads}}::green|underline, {{namespace}}::green|underline, {{node}}::green|underline, {{service}}::green|underline, {{configmap}}::green|underline, {{secret}}::green|underline,
+{{ingress}}::green|underline, {{PVC}}::green|underline, {{HPA}}::green|underline and {{PDB}}::green|underline by {{pod name}}::lightRed and display them in a {{tree}}::lightBlue and {{table}}::lightBlue.
 Find more information at: {{https://pod-lens.guoxudong.io/}}::lightMagenta|underline
 `)
 }
