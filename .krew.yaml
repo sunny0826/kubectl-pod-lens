@@ -29,6 +29,17 @@ spec:
     bin: "pod-lens"
   - selector:
       matchLabels:
+        os: darwin
+        arch: arm64
+    {{addURIAndSha "https://github.com/sunny0826/kubectl-pod-lens/releases/download/{{ .TagName }}/pod-lens_darwin_arm64.tar.gz" .TagName }}
+    files:
+    - from: "./pod-lens"
+      to: "."
+    - from: LICENSE
+      to: "."
+    bin: "pod-lens"
+  - selector:
+      matchLabels:
         os: windows
         arch: amd64
     {{addURIAndSha "https://github.com/sunny0826/kubectl-pod-lens/releases/download/{{ .TagName }}/pod-lens_windows_amd64.zip" .TagName }}
