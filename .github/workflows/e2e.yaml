@@ -41,8 +41,7 @@ jobs:
 
       - name: Go build
         run: |
-          go build -ldflags="-X github.com/sunny0826/kubectl-pod-lens/pkg/version.version=${{ github.run_id }}" \
-          -o bin/kubectl-pod-lens .
+          make bin
 
       - name: Setup Kind
         uses: engineerd/setup-kind@v0.5.0
@@ -54,4 +53,4 @@ jobs:
           echo "current-context:" $(kubectl config current-context)
           echo "environment-kubeconfig:" ${KUBECONFIG}
           kubectl create deployment my-web-app --image=nginx:latest
-          bin/kubectl-pod-lens
+          bin/pod-lens
