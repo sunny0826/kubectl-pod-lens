@@ -65,7 +65,8 @@ jobs:
           kubectl apply -f e2e/deployment.yaml
           kubectl rollout status deployment/my-nginx-deployment
           kubectl get pods
-          bin/pod-lens $(kubectl get pods -l app=my-nginx-deployment --no-headers -o custom-columns=":metadata.name" | head -n 1）
+          depname=`kubectl get pods -l app=my-nginx-deployment --no-headers -o custom-columns=":metadata.name" | head -n 1`
+          bin/pod-lens $podname
 
       - name: Test StatefulSets
         run: |
@@ -75,7 +76,8 @@ jobs:
           kubectl apply -f e2e/statefulset.yaml
           kubectl rollout status statefulset/web
           kubectl get pods
-          bin/pod-lens $(kubectl get pods -l app=nginx --no-headers -o custom-columns=":metadata.name" | head -n 1）
+          stsname=`kubectl get pods -l app=web --no-headers -o custom-columns=":metadata.name" | head -n 1`
+          bin/pod-lens $(stsname）
 
       - name: Test Jobs
         run: |
