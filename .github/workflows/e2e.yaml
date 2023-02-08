@@ -26,10 +26,6 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Get current date
-        id: date
-        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
-
       - name: Setup Go
         uses: actions/setup-go@v3
         with:
@@ -48,15 +44,19 @@ jobs:
         with:
           version: "v0.11.1"
 
-      - name: Testing
+      - name: Test Check
         run: |
           kubectl cluster-info
           kubectl get pods -n kube-system
           echo "current-context:" $(kubectl config current-context)
-          echo "environment-kubeconfig:" ${KUBECONFIG}
-          
-          bin/pod-lens kube-apiserver-kind-control-plane  -n kube-system
+
+      - name: Test Statefulsets
+        run: |
+          bin/pod-lens kube-apiserver-kind-control-plane -n kube-system
           bin/pod-lens etcd-kind-control-plane  -n kube-system
+
+      - name: Test Deployments
+        run: |
           kubectl create deployment e2e-test --image=nginx:latest
           kubectl rollout status deployment/e2e-test
           bin/pod-lens

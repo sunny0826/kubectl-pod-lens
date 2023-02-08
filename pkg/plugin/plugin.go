@@ -2,7 +2,6 @@ package plugin
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 	"strings"
 
@@ -136,8 +135,8 @@ func (sf *SnifferPlugin) getLabelByPod(labelFlag string) error {
 			" {{[release]}}::green" +
 			" {{[app]}}::green" +
 			" {{[k8s-app]}}::green" +
-			" {{[app.kubernetes.io/name]}}::green")
-		os.Exit(1)
+			" {{[app.kubernetes.io/name]}}::green. So no related resources could be found.")
+		//os.Exit(1)
 	}
 	sf.LabelSelector = labelSelector
 	return nil
