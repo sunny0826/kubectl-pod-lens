@@ -5,12 +5,12 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: nginx
+      app: my-nginx-deployment
   replicas: 3
   template:
     metadata:
       labels:
-        app: nginx
+        app: my-nginx-deployment
     spec:
       containers:
         - name: nginx
@@ -26,7 +26,7 @@ metadata:
   name: my-nginx-service
 spec:
   selector:
-    app: nginx
+    app: my-nginx-deployment
   ports:
     - name: http
       port: 80
