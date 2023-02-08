@@ -41,7 +41,7 @@ jobs:
 
       - name: Go build
         run: |
-          go build -ldflags="-X github.com/sunny0826/kubectl-pod-lens/pkg/version.version=${{ github.run_id }} \
+          go build -ldflags="-X github.com/sunny0826/kubectl-pod-lens/pkg/version.version=${{ github.run_id }}" \
           -o bin/kubectl-pod-lens .
 
       - name: Setup Kind
