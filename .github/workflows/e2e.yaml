@@ -54,5 +54,9 @@ jobs:
           kubectl get pods -n kube-system
           echo "current-context:" $(kubectl config current-context)
           echo "environment-kubeconfig:" ${KUBECONFIG}
-          kubectl create deployment my-web-app --image=nginx:latest
+          
+          bin/pod-lens kube-apiserver-kind-control-plane  -n kube-system
+          bin/pod-lens etcd-kind-control-plane  -n kube-system
+          kubectl create deployment e2e-test --image=nginx:latest
+          kubectl rollout status deployment/e2e-test
           bin/pod-lens
