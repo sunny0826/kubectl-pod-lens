@@ -1,0 +1,57 @@
+name: E2E Test
+
+on:
+  push:
+    branches:
+      - "master"
+    paths:
+      - '**.go'
+      - '**.yaml'
+      - '**.mod'
+  pull_request:
+    paths:
+      - '**.go'
+      - '**.yaml'
+      - '**.mod'
+
+env:
+  # Common versions
+  GO_VERSION: '1.18'
+
+jobs:
+  kind:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Get dependencies
+        run: |
+          go get -v -t -d ./...
+
+      - name: Go build
+        run: |
+          go build -ldflags="-X github.com/sunny0826/kubectl-pod-lens/pkg/version.version=${{ github.run_id }} \
+          -o bin/kubectl-pod-lens .
+
+      - name: Setup Kind
+        uses: engineerd/setup-kind@v0.5.0
+
+      - name: Testing
+        run: |
+          kubectl cluster-info
+          kubectl get pods -n kube-system
+          echo "current-context:" $(kubectl config current-context)
+          echo "environment-kubeconfig:" ${KUBECONFIG}
+          kubectl create deployment my-web-app --image=nginx:latest
+          bin/kubectl-pod-lens
