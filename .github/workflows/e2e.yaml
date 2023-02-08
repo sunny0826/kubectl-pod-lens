@@ -50,13 +50,38 @@ jobs:
           kubectl get pods -n kube-system
           echo "current-context:" $(kubectl config current-context)
 
-      - name: Test Statefulsets
+      - name: Test kube-system
         run: |
+          echo "********************************************************************************"
+          echo "Test kube-system..."
+          echo "********************************************************************************"
           bin/pod-lens kube-apiserver-kind-control-plane -n kube-system
-          bin/pod-lens etcd-kind-control-plane  -n kube-system
 
       - name: Test Deployments
         run: |
-          kubectl create deployment e2e-test --image=nginx:latest
-          kubectl rollout status deployment/e2e-test
+          echo "********************************************************************************"
+          echo "Test Deployments..."
+          echo "********************************************************************************"
+          kubectl apply -f e2e/deployment.yaml
+          kubectl rollout status deployment/my-nginx-deployment
+          kubectl get pods
           bin/pod-lens
+
+      - name: Test StatefulSets
+        run: |
+          echo "********************************************************************************"
+          echo "Test StatefulSets..."
+          echo "********************************************************************************"
+          kubectl apply -f e2e/statefulset.yaml
+          kubectl rollout status statefulset/web
+          kubectl get pods
+          bin/pod-lens
+
+      - name: Test Jobs
+        run: |
+          echo "********************************************************************************"
+          echo "Test Jobs..."
+          echo "********************************************************************************"
+          kubectl apply -f e2e/job.yaml
+          kubectl wait --for=condition=complete job/my-batch-job
+          bin/pod-lens my-batch-job-container
