@@ -3,7 +3,7 @@ module github.com/sunny0826/kubectl-pod-lens
 go 1.18
 
 require (
-	github.com/deckarep/golang-set v1.7.1
+	github.com/deckarep/golang-set v1.8.0
 	github.com/fatih/color v1.7.0
 	github.com/gosuri/uitable v0.0.4
 	github.com/i582/cfmt v1.0.7
