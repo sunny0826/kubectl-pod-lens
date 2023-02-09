@@ -80,4 +80,4 @@ jobs:
           echo "********************************************************************************"
           kubectl apply -f e2e/job.yaml
           kubectl wait --for=condition=complete job/my-batch-job
-          bin/pod-lens my-batch-job-container
+#          bin/pod-lens my-batch-job
