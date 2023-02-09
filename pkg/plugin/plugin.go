@@ -2,7 +2,6 @@ package plugin
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 	"strings"
 
@@ -131,14 +130,15 @@ func (sf *SnifferPlugin) getLabelByPod(labelFlag string) error {
 		labelSelector = "k8s-app=" + labels["k8s-app"]
 	} else if _, ok = labels["app.kubernetes.io/name"]; ok {
 		labelSelector = "app.kubernetes.io/name=" + labels["app.kubernetes.io/name"]
-	} else {
-		_, _ = cfmt.Println("Failed to get other, These labels do not exist:" +
-			" {{[release]}}::green" +
-			" {{[app]}}::green" +
-			" {{[k8s-app]}}::green" +
-			" {{[app.kubernetes.io/name]}}::green")
-		os.Exit(1)
 	}
+	//else {
+	//	_, _ = cfmt.Println("Failed to get other, These labels do not exist:" +
+	//		" {{[release]}}::green" +
+	//		" {{[app]}}::green" +
+	//		" {{[k8s-app]}}::green" +
+	//		" {{[app.kubernetes.io/name]}}::green.")
+	//	os.Exit(1)
+	//}
 	sf.LabelSelector = labelSelector
 	return nil
 }
