@@ -71,7 +71,7 @@ jobs:
           echo "********************************************************************************"
           kubectl apply -f e2e/statefulset.yaml
           kubectl rollout status statefulset/web
-#          bin/pod-lens web-0
+          bin/pod-lens web-0
 
       - name: Test Jobs
         run: |
@@ -80,4 +80,4 @@ jobs:
           echo "********************************************************************************"
           kubectl apply -f e2e/job.yaml
           kubectl wait --for=condition=complete job/my-batch-job
-#          bin/pod-lens my-batch-job
+          bin/pod-lens my-batch-job

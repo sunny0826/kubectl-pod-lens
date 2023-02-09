@@ -1,7 +1,9 @@
 package plugin
 
 import (
+	"context"
 	"fmt"
+	netv1 "k8s.io/api/networking/v1"
 	"regexp"
 	"strings"
 
@@ -17,8 +19,7 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	autov1 "k8s.io/api/autoscaling/v1"
 	v1 "k8s.io/api/core/v1"
-	"k8s.io/api/extensions/v1beta1"
-	policyv1beta1 "k8s.io/api/policy/v1beta1"
+	policyv1 "k8s.io/api/policy/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
@@ -39,12 +40,12 @@ type AllInfo struct {
 	StsList       *appsv1.StatefulSetList
 	DsList        *appsv1.DaemonSetList
 	SvcList       *v1.ServiceList
-	IngList       *v1beta1.IngressList
+	IngList       *netv1.IngressList
 	PvcList       *v1.PersistentVolumeClaimList
 	ConfigMapList *v1.ConfigMapList
 	SecretList    *v1.SecretList
 	Hpa           *autov1.HorizontalPodAutoscaler
-	Pdbs          []*policyv1beta1.PodDisruptionBudget
+	Pdbs          []*policyv1.PodDisruptionBudget
 	Workload      Workload
 }
 
@@ -74,7 +75,7 @@ func NewSnifferPlugin(configFlags *genericclioptions.ConfigFlags) (*SnifferPlugi
 }
 
 func (sf *SnifferPlugin) findPodByName(name, namespace string) error {
-	pods, err := sf.Clientset.CoreV1().Pods(namespace).List(metav1.ListOptions{})
+	pods, err := sf.Clientset.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil || len(pods.Items) == 0 {
 		return errors.New("Failed to get pod: [" +
 			name + "], please check your parameters, set a context or verify API server.")
@@ -98,7 +99,7 @@ func (sf *SnifferPlugin) findPodByName(name, namespace string) error {
 }
 
 func (sf *SnifferPlugin) findNodeByName() error {
-	nodeObject, err := sf.Clientset.CoreV1().Nodes().Get(sf.PodObject.Spec.NodeName, metav1.GetOptions{})
+	nodeObject, err := sf.Clientset.CoreV1().Nodes().Get(context.TODO(), sf.PodObject.Spec.NodeName, metav1.GetOptions{})
 	if err != nil {
 		return errors.New("Failed to get nodes info, verify the connection to their pool.")
 	}
@@ -145,7 +146,7 @@ func (sf *SnifferPlugin) getLabelByPod(labelFlag string) error {
 
 func (sf *SnifferPlugin) findDeployByLabel(namespace string) error {
 	deployFind, err := sf.Clientset.AppsV1().Deployments(namespace).List(
-		metav1.ListOptions{LabelSelector: sf.LabelSelector})
+		context.TODO(), metav1.ListOptions{LabelSelector: sf.LabelSelector})
 	if err != nil {
 		return err
 	}
@@ -155,7 +156,7 @@ func (sf *SnifferPlugin) findDeployByLabel(namespace string) error {
 
 func (sf *SnifferPlugin) findStsByLabel(namespace string) error {
 	stsFind, err := sf.Clientset.AppsV1().StatefulSets(namespace).List(
-		metav1.ListOptions{LabelSelector: sf.LabelSelector})
+		context.TODO(), metav1.ListOptions{LabelSelector: sf.LabelSelector})
 	if err != nil {
 		return err
 	}
@@ -165,7 +166,7 @@ func (sf *SnifferPlugin) findStsByLabel(namespace string) error {
 
 func (sf *SnifferPlugin) findDsByLabel(namespace string) error {
 	dsFind, err := sf.Clientset.AppsV1().DaemonSets(namespace).List(
-		metav1.ListOptions{LabelSelector: sf.LabelSelector})
+		context.TODO(), metav1.ListOptions{LabelSelector: sf.LabelSelector})
 	if err != nil {
 		return err
 	}
@@ -175,7 +176,7 @@ func (sf *SnifferPlugin) findDsByLabel(namespace string) error {
 
 func (sf *SnifferPlugin) findSvcByLabel(namespace string) error {
 	svcFind, err := sf.Clientset.CoreV1().Services(namespace).List(
-		metav1.ListOptions{LabelSelector: sf.LabelSelector})
+		context.TODO(), metav1.ListOptions{LabelSelector: sf.LabelSelector})
 	if err != nil {
 		return err
 	}
@@ -184,8 +185,8 @@ func (sf *SnifferPlugin) findSvcByLabel(namespace string) error {
 }
 
 func (sf *SnifferPlugin) findIngressByLabel(namespace string) error {
-	ingFind, err := sf.Clientset.ExtensionsV1beta1().Ingresses(namespace).List(
-		metav1.ListOptions{LabelSelector: sf.LabelSelector})
+	ingFind, err := sf.Clientset.NetworkingV1().Ingresses(namespace).List(
+		context.TODO(), metav1.ListOptions{LabelSelector: sf.LabelSelector})
 	if err != nil {
 		return err
 	}
@@ -195,7 +196,7 @@ func (sf *SnifferPlugin) findIngressByLabel(namespace string) error {
 
 func (sf *SnifferPlugin) findPVCByLabel(namespace string) error {
 	pvcFind, err := sf.Clientset.CoreV1().PersistentVolumeClaims(namespace).List(
-		metav1.ListOptions{LabelSelector: sf.LabelSelector})
+		context.TODO(), metav1.ListOptions{LabelSelector: sf.LabelSelector})
 	if err != nil {
 		return err
 	}
@@ -205,7 +206,7 @@ func (sf *SnifferPlugin) findPVCByLabel(namespace string) error {
 
 func (sf *SnifferPlugin) findConfigMapByLabel(namespace string) error {
 	configMapFind, err := sf.Clientset.CoreV1().ConfigMaps(namespace).List(
-		metav1.ListOptions{LabelSelector: sf.LabelSelector})
+		context.TODO(), metav1.ListOptions{LabelSelector: sf.LabelSelector})
 	if err != nil {
 		return err
 	}
@@ -215,7 +216,7 @@ func (sf *SnifferPlugin) findConfigMapByLabel(namespace string) error {
 
 func (sf *SnifferPlugin) findSecretByLabel(namespace string) error {
 	secretFind, err := sf.Clientset.CoreV1().Secrets(namespace).List(
-		metav1.ListOptions{LabelSelector: sf.LabelSelector})
+		context.TODO(), metav1.ListOptions{LabelSelector: sf.LabelSelector})
 	if err != nil {
 		return err
 	}
@@ -231,6 +232,7 @@ func (sf *SnifferPlugin) getOwnerByPod() error {
 		case "replicaset":
 			rsObject, err := sf.Clientset.AppsV1().ReplicaSets(
 				sf.PodObject.GetNamespace()).Get(
+				context.TODO(),
 				existingOwnerRef.Name,
 				metav1.GetOptions{})
 			if err != nil {
@@ -251,6 +253,7 @@ func (sf *SnifferPlugin) getOwnerByPod() error {
 		case "statefulset":
 			ssObject, err := sf.Clientset.AppsV1().StatefulSets(
 				sf.PodObject.GetNamespace()).Get(
+				context.TODO(),
 				existingOwnerRef.Name,
 				metav1.GetOptions{})
 			if err != nil {
@@ -268,6 +271,7 @@ func (sf *SnifferPlugin) getOwnerByPod() error {
 		case "daemonset":
 			dsObject, err := sf.Clientset.AppsV1().DaemonSets(
 				sf.PodObject.GetNamespace()).Get(
+				context.TODO(),
 				existingOwnerRef.Name,
 				metav1.GetOptions{})
 			if err != nil {
@@ -295,6 +299,7 @@ func (sf *SnifferPlugin) getOwnerByPod() error {
 
 func (sf *SnifferPlugin) findHpaByName(namespace string) error {
 	hpaFind, err := sf.Clientset.AutoscalingV1().HorizontalPodAutoscalers(namespace).List(
+		context.TODO(),
 		metav1.ListOptions{})
 	if err != nil {
 		return err
@@ -309,7 +314,8 @@ func (sf *SnifferPlugin) findHpaByName(namespace string) error {
 
 func (sf *SnifferPlugin) findPdbByName(namespace string) error {
 
-	pdbFind, err := sf.Clientset.PolicyV1beta1().PodDisruptionBudgets(namespace).List(
+	pdbFind, err := sf.Clientset.PolicyV1().PodDisruptionBudgets(namespace).List(
+		context.TODO(),
 		metav1.ListOptions{})
 	if err != nil {
 		return err
@@ -534,7 +540,7 @@ func (sf *SnifferPlugin) printResource() error {
 			for _, p := range r.IngressRuleValue.HTTP.Paths {
 				table.AddRow("Url:", cfmt.Sprintf("{{https://%s%s}}::url",
 					r.Host, p.Path))
-				table.AddRow("Backend:", p.Backend.ServiceName)
+				table.AddRow("Backend:", p.Backend.Service.Name)
 			}
 		}
 		var loadBalancesList string
@@ -597,8 +603,8 @@ func (sf *SnifferPlugin) printResource() error {
 			table.AddRow("MaxAvailable:", cfmt.Sprintf("{{%s}}::lightGreen",
 				pdb.Spec.MaxUnavailable))
 		}
-		table.AddRow("Disruptions:", cfmt.Sprintf("{{%d}}::lightGreen",
-			pdb.Status.PodDisruptionsAllowed))
+		//table.AddRow("Disruptions:", cfmt.Sprintf("{{%d}}::lightGreen",
+		//	pdb.Status.PodDisruptionsAllowed))
 		table.AddRow("---", "---")
 	}
 
