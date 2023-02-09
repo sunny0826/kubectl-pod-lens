@@ -7,7 +7,7 @@ require (
 	github.com/fatih/color v1.7.0
 	github.com/gosuri/uitable v0.0.4
 	github.com/i582/cfmt v1.0.7
-	github.com/manifoldco/promptui v0.8.0
+	github.com/manifoldco/promptui v0.9.0
 	github.com/pkg/errors v0.8.1
 	github.com/pterm/pterm v0.12.8
 	github.com/spf13/cobra v0.0.4
@@ -44,9 +44,7 @@ require (
 	github.com/imdario/mergo v0.3.7 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.6 // indirect
-	github.com/juju/ansiterm v0.0.0-20180109212912-720a0952cc2a // indirect
 	github.com/lucasb-eyer/go-colorful v1.0.3 // indirect
-	github.com/lunixbochs/vtclean v0.0.0-20180621232353-2d01aacdc34a // indirect
 	github.com/magiconair/properties v1.8.0 // indirect
 	github.com/mailru/easyjson v0.0.0-20160728113105-d5b7844b561a // indirect
 	github.com/mattn/go-colorable v0.1.8 // indirect
