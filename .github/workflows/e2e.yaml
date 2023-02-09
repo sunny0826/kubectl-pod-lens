@@ -62,11 +62,7 @@ jobs:
           echo "********************************************************************************"
           echo "Test Deployments..."
           echo "********************************************************************************"
-          kubectl apply -f e2e/deployment.yaml
-          kubectl rollout status deployment/my-nginx-deployment
-          kubectl get pods
-          depname=`kubectl get pods -l app=my-nginx-deployment --no-headers -o custom-columns=":metadata.name" | head -n 1`
-          bin/pod-lens $podname
+          make e2e-deployment
 
       - name: Test StatefulSets
         run: |
@@ -75,9 +71,7 @@ jobs:
           echo "********************************************************************************"
           kubectl apply -f e2e/statefulset.yaml
           kubectl rollout status statefulset/web
-          kubectl get pods
-          stsname=`kubectl get pods -l app=web --no-headers -o custom-columns=":metadata.name" | head -n 1`
-          bin/pod-lens $(stsname）
+#          bin/pod-lens web-0
 
       - name: Test Jobs
         run: |
