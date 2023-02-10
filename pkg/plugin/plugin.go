@@ -122,24 +122,23 @@ func (sf *SnifferPlugin) getLabelByPod(labelFlag string) error {
 		}
 	}
 	var labelSelector string
-	labels := sf.PodObject.Labels
-	if _, ok := labels["app"]; ok {
-		labelSelector = "app=" + labels["app"]
-	} else if _, ok = labels["release"]; ok {
-		labelSelector = "release=" + labels["release"]
-	} else if _, ok = labels["k8s-app"]; ok {
-		labelSelector = "k8s-app=" + labels["k8s-app"]
-	} else if _, ok = labels["app.kubernetes.io/name"]; ok {
-		labelSelector = "app.kubernetes.io/name=" + labels["app.kubernetes.io/name"]
+	l := sf.PodObject.Labels
+	if _, ok := l["app"]; ok {
+		labelSelector = "app=" + l["app"]
+	} else if _, ok = l["release"]; ok {
+		labelSelector = "release=" + l["release"]
+	} else if _, ok = l["k8s-app"]; ok {
+		labelSelector = "k8s-app=" + l["k8s-app"]
+	} else if _, ok = l["app.kubernetes.io/name"]; ok {
+		labelSelector = "app.kubernetes.io/name=" + l["app.kubernetes.io/name"]
+	} else {
+		_, _ = cfmt.Println("Failed to get other, These l do not exist:" +
+			" {{[release]}}::green" +
+			" {{[app]}}::green" +
+			" {{[k8s-app]}}::green" +
+			" {{[app.kubernetes.io/name]}}::green.+" +
+			" So no related resources could be found.")
 	}
-	//else {
-	//	_, _ = cfmt.Println("Failed to get other, These labels do not exist:" +
-	//		" {{[release]}}::green" +
-	//		" {{[app]}}::green" +
-	//		" {{[k8s-app]}}::green" +
-	//		" {{[app.kubernetes.io/name]}}::green.")
-	//	os.Exit(1)
-	//}
 	sf.LabelSelector = labelSelector
 	return nil
 }
@@ -603,8 +602,8 @@ func (sf *SnifferPlugin) printResource() error {
 			table.AddRow("MaxAvailable:", cfmt.Sprintf("{{%s}}::lightGreen",
 				pdb.Spec.MaxUnavailable))
 		}
-		//table.AddRow("Disruptions:", cfmt.Sprintf("{{%d}}::lightGreen",
-		//	pdb.Status.PodDisruptionsAllowed))
+		table.AddRow("Disruptions:", cfmt.Sprintf("{{%d}}::lightGreen",
+			pdb.Status.DisruptionsAllowed))
 		table.AddRow("---", "---")
 	}
 

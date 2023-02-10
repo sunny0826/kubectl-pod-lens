@@ -73,11 +73,11 @@ jobs:
           kubectl rollout status statefulset/web
           bin/pod-lens web-0
 
-      - name: Test Jobs
+      - name: Test DaemonSet
         run: |
           echo "********************************************************************************"
-          echo "Test Jobs..."
+          echo "Test DaemonSet..."
           echo "********************************************************************************"
-          kubectl apply -f e2e/job.yaml
-          kubectl wait --for=condition=complete job/my-batch-job
-          bin/pod-lens my-batch-job
+          kubectl apply -f e2e/daemonset.yaml
+          kubectl rollout status daemonset/my-daemonset
+          bin/pod-lens my-daemonset-*
