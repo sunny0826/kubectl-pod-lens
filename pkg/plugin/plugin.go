@@ -13,7 +13,7 @@ import (
 	mapset "github.com/deckarep/golang-set"
 	"github.com/gosuri/uitable"
 
-	"github.com/i582/cfmt"
+	"github.com/i582/cfmt/cmd/cfmt"
 	"github.com/pkg/errors"
 	"github.com/pterm/pterm"
 	appsv1 "k8s.io/api/apps/v1"

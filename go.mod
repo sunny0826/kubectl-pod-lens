@@ -6,7 +6,7 @@ require (
 	github.com/deckarep/golang-set v1.8.0
 	github.com/fatih/color v1.14.1
 	github.com/gosuri/uitable v0.0.4
-	github.com/i582/cfmt v1.0.7
+	github.com/i582/cfmt v1.4.0
 	github.com/manifoldco/promptui v0.9.0
 	github.com/pkg/errors v0.9.1
 	github.com/pterm/pterm v0.12.54
