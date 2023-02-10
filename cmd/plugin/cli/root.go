@@ -8,7 +8,7 @@ import (
 
 	"k8s.io/klog"
 
-	"github.com/i582/cfmt"
+	"github.com/i582/cfmt/cmd/cfmt"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
