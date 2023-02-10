@@ -81,6 +81,10 @@ func (sf *SnifferPlugin) findPodByName(name, namespace string) error {
 			name + "], please check your parameters, set a context or verify API server.")
 	}
 
+	if name[len(name)-1:] == "*" {
+		name = name[:len(name)-1]
+	}
+
 	podList, err := select_pod.MatchPods(pods, name)
 	if err != nil {
 		return err
