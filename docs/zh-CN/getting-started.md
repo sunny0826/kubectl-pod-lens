@@ -5,8 +5,8 @@ slug: /
 
 ## 需要
 
-- Kubernetes 1.10.0+
-- Kubectl 1.13.0+
+- Kubernetes 1.19.0+
+- Kubectl 1.18.0+
 - Krew 0.4.0+
 
 ## 安装
@@ -25,5 +25,5 @@ kubectl pod-lens -h
 
 ## That's it!
 
-恭喜! 您已经成功安装和运行 kubectl pod-lens 了！
+恭喜! 您已经成功安装和运行 `kubectl pod-lens` 了！
 

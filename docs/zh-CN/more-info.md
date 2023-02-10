@@ -6,18 +6,25 @@ title: 更多信息
 
 ## 交互式操作
 
-```shell
+```console
 kubectl pod-lens
 ```
 
 ## 展示 Pod 相关 K8S 资源
 
-```shell
+```console
 kubectl pod-lens <pod-name>
 ```
 
-## 指定 LabelSelector
+### 输入 pod name 模糊匹配
 
-```shell
+```console
+kubectl pod-lens prometheus-prometheus-operator-prometheus-
+kubectl pod-lens prometheus-prometheus-operator-prometheus-* # fuzzy matching
+```
+
+### 指定 LabelSelector
+
+```console
 kubectl pod-lens <pod-name> -l app=demo
 ```

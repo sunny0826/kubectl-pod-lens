@@ -6,18 +6,26 @@ title: More Info
 
 ## Interactive operation
 
-```shell
+```console
 kubectl pod-lens
 ```
 
 ## Show pod-related resources
 
-```shell
+```console
 kubectl pod-lens <pod-name>
 ```
 
-## Assign LabelSelector
+### Support input pod name fuzzy matching
 
-```shell
+```console
+kubectl pod-lens prometheus-prometheus-operator-prometheus-
+kubectl pod-lens prometheus-prometheus-operator-prometheus-* # fuzzy matching
+```
+
+
+### Assign LabelSelector
+
+```console
 kubectl pod-lens <pod-name> -l app=demo
 ```
