@@ -33,6 +33,9 @@ func RootCmd() *cobra.Command {
 $ kubectl pod-lens
 # Show pod-related resources
 $ kubectl pod-lens prometheus-prometheus-operator-prometheus-0
+# Support input pod name fuzzy matching
+$ kubectl pod-lens prometheus-prometheus-operator-prometheus-
+$ kubectl pod-lens prometheus-prometheus-operator-prometheus-*
 `,
 		SilenceErrors: true,
 		SilenceUsage:  true,
