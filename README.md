@@ -3,6 +3,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/sunny0826/kubectl-sniffer)](https://goreportcard.com/report/github.com/sunny0826/kubectl-sniffer)
 ![GitHub](https://img.shields.io/github/license/sunny0826/kubectl-sniffer.svg)
 [![GitHub release](https://img.shields.io/github/release/sunny0826/kubectl-sniffer)](https://github.com/sunny0826/kubectl-sniffer/releases)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/4e958759-6e9e-4c87-be89-4cb60e3036a0/deploy-status)](https://app.netlify.com/sites/kubectl-pod-lens/deploys)
 
 <p align="center">
     <a href="https://pod-lens.guoxudong.io">
@@ -23,12 +24,12 @@ The plugin can display pod-related:
 * HPA
 * PodDisruptionBudget (PDB)
 
-**website**: [pod-lens.guoxudong.io](https://pod-lens.guoxudong.io)
+**Website**: [pod-lens.guoxudong.io](https://pod-lens.guoxudong.io)
 
 ## Requirements
 
-- Kubernetes 1.10.0+
-- Kubectl 1.13.0+
+- Kubernetes 1.19.0+
+- Kubectl 1.18.0+
 - Krew 0.4.0+
 
 ## Installation
