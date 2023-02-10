@@ -50,12 +50,13 @@ jobs:
           kubectl get pods -n kube-system
           echo "current-context:" $(kubectl config current-context)
 
-      - name: Test kube-system
+      - name: Test Installation
         run: |
           echo "********************************************************************************"
-          echo "Test kube-system..."
+          echo "Test Installation..."
           echo "********************************************************************************"
-          bin/pod-lens kube-apiserver-kind-control-plane -n kube-system
+          kubectl create deployment nginx --image=nginx
+          bin/pod-lens
 
       - name: Test Deployments
         run: |
